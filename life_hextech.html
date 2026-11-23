@@ -1,0 +1,2381 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#14110f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="人生海克斯">
+  <title>人生海克斯 (Life Hextech) Android App</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans SC"', 'sans-serif'],
+            hextech: ['Orbitron', '"Noto Sans SC"', 'sans-serif']
+          },
+          colors: {
+            hextech: {
+              silver: '#9aa0a6',
+              silverGlow: '#c8d6e5',
+              gold: '#f1c40f',
+              goldGlow: '#f39c12',
+              prismatic: '#a855f7',
+              prismaticGlow: '#ec4899',
+              darkBg: '#090d16',
+              cardBg: '#111827',
+              cyanGlow: '#06b6d4',
+              goldBorder: '#d97706'
+            }
+          },
+          boxShadow: {
+            'silver-glow': '0 0 15px rgba(160, 174, 192, 0.5), inset 0 0 15px rgba(255, 255, 255, 0.2)',
+            'gold-glow': '0 0 20px rgba(245, 158, 11, 0.6), inset 0 0 20px rgba(252, 211, 77, 0.3)',
+            'prismatic-glow': '0 0 25px rgba(168, 85, 247, 0.7), 0 0 10px rgba(236, 72, 153, 0.5), inset 0 0 20px rgba(244, 114, 182, 0.4)',
+            'cyan-glow': '0 0 15px rgba(6, 182, 212, 0.6)'
+          },
+          animation: {
+            'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 3s ease-in-out infinite',
+            'shimmer': 'shimmer 2.5s infinite linear',
+            'glow-spin': 'spin 8s linear infinite'
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #14110f;
+      color: #f5efe6;
+      background-image: 
+        radial-gradient(circle at 25% 12%, rgba(245, 158, 11, 0.12) 0%, transparent 55%),
+        radial-gradient(circle at 80% 75%, rgba(244, 114, 182, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(217, 119, 6, 0.05) 0%, transparent 70%);
+      min-height: 100vh;
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: contain;
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding-bottom: 1.5rem;
+      }
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #191512; }
+    ::-webkit-scrollbar-thumb { background: #3b312a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #d97706; }
+
+    /* Custom Hextech Card Borders (Warm Soft Palette) */
+    .card-tier-silver {
+      border: 2px solid #cbd5e1;
+      background: linear-gradient(145deg, rgba(48, 42, 38, 0.92), rgba(28, 24, 21, 0.96));
+      box-shadow: 0 4px 16px rgba(214, 211, 209, 0.18);
+    }
+    .card-tier-gold {
+      border: 2px solid #fbbf24;
+      background: linear-gradient(145deg, rgba(66, 46, 22, 0.92), rgba(32, 24, 17, 0.96));
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.28);
+    }
+    .card-tier-prismatic {
+      border: 2px solid #f472b6;
+      background: linear-gradient(145deg, rgba(68, 34, 48, 0.92), rgba(33, 21, 27, 0.96));
+      box-shadow: 0 4px 24px rgba(244, 114, 182, 0.32), inset 0 0 14px rgba(251, 191, 36, 0.18);
+    }
+
+    /* Warm Frosted Glass Panels */
+    .glass-panel {
+      background: rgba(31, 26, 23, 0.82);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(251, 191, 36, 0.14);
+    }
+
+    .hextech-button {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .hextech-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent, rgba(255,248,235,0.18), transparent);
+      transform: rotate(30deg);
+      transition: all 0.6s ease;
+    }
+    .hextech-button:hover::after {
+      left: 100%;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased text-stone-100 select-none sm:select-auto">
+
+  <!-- Header / Top App Bar -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-amber-500/15 px-3 sm:px-4 py-2.5 sm:py-3 shadow-md" style="padding-top: max(0.625rem, env(safe-area-inset-top));">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center space-x-2.5">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-400 to-rose-400 p-0.5 shadow-gold-glow">
+          <div class="w-full h-full bg-stone-950 rounded-[10px] flex items-center justify-center">
+            <i class="fa-solid fa-gem text-amber-300 text-base sm:text-lg"></i>
+          </div>
+        </div>
+        <div>
+          <h1 class="font-hextech text-base sm:text-xl font-black tracking-wider bg-gradient-to-r from-amber-200 via-orange-300 to-rose-300 bg-clip-text text-transparent flex items-center gap-1.5">
+            人生海克斯 <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-950/90 text-amber-200 border border-amber-700/60 font-mono">APP</span>
+          </h1>
+          <p class="text-[10px] sm:text-xs text-stone-400 hidden xs:block">Android 随身强化与任务引擎</p>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Tabs -->
+      <nav class="hidden md:flex items-center space-x-1.5 bg-stone-900/85 p-1 rounded-xl border border-amber-500/15">
+        <button id="nav-hub" onclick="switchTab('hub')" class="tab-btn active px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-amber-300 bg-stone-800 shadow">
+          <i class="fa-solid fa-gamepad"></i><span>海克斯中枢</span>
+        </button>
+        <button id="nav-tasks" onclick="switchTab('tasks')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-stone-400 hover:text-stone-200">
+          <i class="fa-solid fa-list-check"></i><span>每日任务</span>
+        </button>
+        <button id="nav-journal" onclick="switchTab('journal')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-stone-400 hover:text-stone-200 relative">
+          <i class="fa-solid fa-book-journal-whills text-amber-400"></i><span>冒险日志</span>
+        </button>
+        <button id="nav-db" onclick="switchTab('db')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-stone-400 hover:text-stone-200">
+          <i class="fa-solid fa-database text-orange-300"></i><span>卡库(165)</span>
+        </button>
+        <button id="nav-stats" onclick="switchTab('stats')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-stone-400 hover:text-stone-200">
+          <i class="fa-solid fa-trophy text-amber-400"></i><span>结算</span>
+        </button>
+        <button id="nav-settings" onclick="switchTab('settings')" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 text-stone-400 hover:text-stone-200">
+          <i class="fa-solid fa-sliders text-rose-300"></i><span>API/安装</span>
+        </button>
+      </nav>
+
+      <!-- User Bar & Status -->
+      <div class="flex items-center space-x-2">
+        <!-- Quick API Status Pill -->
+        <button onclick="switchTab('settings')" id="header-api-status" class="px-2.5 py-1 rounded-lg bg-stone-900 border border-amber-500/25 text-[10px] font-mono text-amber-300 flex items-center gap-1 hover:border-amber-400 transition" title="点击配置 Gemini API">
+          <span id="api-dot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span id="api-status-label">API配置</span>
+        </button>
+
+        <!-- Player Level Badge -->
+        <div class="flex items-center space-x-1.5 bg-stone-900/90 border border-amber-500/30 px-2.5 py-1 rounded-xl">
+          <i class="fa-solid fa-shield-halved text-amber-400 text-xs"></i>
+          <div>
+            <div id="hextech-level-text" class="text-[11px] font-black text-amber-200 font-mono">Lv.1 · 1-1</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-5">
+
+    <!-- TAB 1: 海克斯中枢 (HUB) -->
+    <div id="tab-hub" class="tab-content space-y-5">
+      
+      <!-- Top Status Banner: Daily Tier Sequence & Pool Tracker -->
+      <div class="glass-panel rounded-2xl p-4 border border-amber-500/20 shadow-lg relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl"></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 relative z-10">
+          
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base sm:text-lg font-bold text-amber-100 flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                今日海克斯轮次预告
+              </h2>
+              <span id="current-day-badge" class="text-[10px] px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold">冒险日</span>
+            </div>
+            <p class="text-xs text-stone-400 mt-0.5">每日随机三轮抽取阶级。同轮三卡阶级相同，单卡限刷新 1 次且同日绝不重复！</p>
+          </div>
+
+          <!-- Pool Counter & Tier Badges -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="px-2.5 py-1 rounded-xl bg-stone-950/90 border border-amber-500/20 text-[11px] font-mono text-amber-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-layer-group text-orange-400"></i>
+              <span>已见: <strong id="seen-cards-counter" class="text-amber-300">0</strong>/165</span>
+            </div>
+            <div class="flex items-center space-x-1.5" id="daily-tier-sequence-container">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Hub Main Grid: Stage Selection Arena + Active Augments + Quick Quest Preview -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Left 5 Cols: Hextech Selection Stage & Active Buffs -->
+        <div class="lg:col-span-5 space-y-5">
+          
+          <!-- Stage Card (Summon / Pick Augments) -->
+          <div id="hextech-stage-card" class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/30 shadow-xl space-y-4">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Active Hextech Augments Today -->
+          <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/15 space-y-3">
+            <div class="flex items-center justify-between border-b border-stone-800 pb-2.5">
+              <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i> 今日已激活海克斯强化
+              </h3>
+              <span id="active-buff-count" class="text-xs font-mono text-stone-400">0 / 3</span>
+            </div>
+            <div id="active-buffs-container" class="space-y-2.5">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right 7 Cols: Today's Priority Task Overview & Quick Actions -->
+        <div class="lg:col-span-7 space-y-5">
+          <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/15 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-stone-800 pb-3">
+              <div>
+                <h3 class="text-sm font-bold text-amber-200 flex items-center gap-2">
+                  <i class="fa-solid fa-list-check text-orange-400"></i> 今日实时任务进度
+                </h3>
+                <p class="text-[11px] text-stone-400">点击完成打卡；点击骰子按钮可填写理由重新随机单项任务</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="openPerCategoryModal()" class="px-3 py-1.5 rounded-lg bg-amber-950/90 hover:bg-amber-900 border border-amber-600/60 text-amber-200 text-xs font-bold transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i><span>分类生成</span>
+                </button>
+                <button onclick="switchTab('tasks')" class="px-3 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold transition">
+                  全部任务
+                </button>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-stone-400">今日完成率 · 积分 <strong id="hub-score-val" class="text-amber-300">120</strong></span>
+                <span id="hub-progress-text" class="text-amber-300 font-bold">0% (0/0)</span>
+              </div>
+              <div class="w-full h-2.5 bg-stone-900 rounded-full overflow-hidden border border-stone-800">
+                <div id="hub-progress-bar" class="h-full bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Compact Task List in Hub -->
+            <div id="hub-tasks-preview" class="space-y-2.5 max-h-[440px] overflow-y-auto pr-1">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 2: 每日任务调度中心 (TASKS) -->
+    <div id="tab-tasks" class="tab-content hidden space-y-5">
+      <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg sm:text-xl font-black text-amber-200 flex items-center gap-2 font-hextech">
+            <i class="fa-solid fa-scroll text-orange-400"></i> 每日任务调度中心
+          </h2>
+          <p class="text-xs text-stone-400 mt-1">优先级：紧急导入 > 当天导入 > 周日预排 > 分类随机（支持单项说明理由重随）</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <button onclick="openPerCategoryModal()" class="flex-1 sm:flex-none hextech-button px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-xs font-black text-stone-950 shadow-gold-glow flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-sliders"></i><span>分类别随机生成</span>
+          </button>
+          <button onclick="openImportTaskModal()" class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 border border-amber-500/50 text-amber-200 text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-plus"></i><span>导入任务</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Full Tasks Grid -->
+      <div id="tasks-full-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- TAB 3: 冒险日志 / 日记功能 (JOURNAL) -->
+    <div id="tab-journal" class="tab-content hidden space-y-5">
+      
+      <!-- Journal Header & Date Selector -->
+      <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/20 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg sm:text-xl font-black text-amber-300 flex items-center gap-2 font-hextech">
+            <i class="fa-solid fa-book-bookmark"></i> 每日冒险日志
+          </h2>
+          <p class="text-xs text-stone-400 mt-1">自动汇总任务/重随理由/海克斯战报 + 个人手记心情记录</p>
+        </div>
+
+        <!-- Date Selector for past days -->
+        <div class="flex items-center space-x-2 bg-stone-900/90 p-1.5 rounded-xl border border-stone-800 self-end md:self-auto">
+          <button onclick="changeJournalDay(-1)" class="w-8 h-8 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs flex items-center justify-center">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="text-center px-3">
+            <div id="journal-view-date-title" class="text-xs font-bold text-amber-300">Today</div>
+            <div id="journal-view-day-name" class="text-[10px] text-stone-400">冒险日</div>
+          </div>
+          <button onclick="changeJournalDay(1)" class="w-8 h-8 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs flex items-center justify-center">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        
+        <!-- Left: Auto-Generated Part -->
+        <div class="lg:col-span-6 space-y-4">
+          <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/20 relative">
+            <div class="flex items-center justify-between mb-3 pb-2.5 border-b border-stone-800">
+              <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                <i class="fa-solid fa-robot"></i> 自动生成战报部分
+              </h3>
+              <button onclick="syncAutoJournal()" class="text-xs px-2.5 py-1 rounded-lg bg-amber-950 text-amber-300 border border-amber-700/70 hover:bg-amber-900 transition flex items-center gap-1">
+                <i class="fa-solid fa-rotate"></i><span>同步进度</span>
+              </button>
+            </div>
+
+            <div id="auto-journal-content" class="space-y-4 text-xs text-stone-300 leading-relaxed font-mono bg-stone-950/70 p-3.5 rounded-xl border border-stone-800/80 max-h-72 overflow-y-auto">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <div class="mt-3 pt-3 border-t border-stone-800/80 flex items-center justify-between">
+              <span class="text-[11px] text-stone-400">连接 Gemini API 生成史官评语：</span>
+              <button onclick="generateAIJournalSummary()" class="hextech-button bg-gradient-to-r from-amber-500 to-orange-500 text-stone-950 font-black text-xs px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                <i class="fa-solid fa-sparkles"></i><span>AI 精炼评语</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Manual Entry Part -->
+        <div class="lg:col-span-6 space-y-4">
+          <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/20 space-y-4">
+            <div class="flex items-center justify-between pb-2.5 border-b border-stone-800">
+              <h3 class="text-sm font-bold text-amber-300 flex items-center gap-2">
+                <i class="fa-solid fa-pen-to-square"></i> 手动撰写手记部分
+              </h3>
+              <span id="save-journal-status" class="text-[11px] text-emerald-400 font-mono"><i class="fa-solid fa-check"></i> 已保存</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs text-stone-400">心情:</span>
+                <select id="journal-mood-select" onchange="saveManualJournal()" class="bg-stone-900 border border-stone-700 text-xs text-amber-300 rounded-lg px-2 py-1.5 outline-none">
+                  <option value="🔥 状态绝佳">🔥 状态绝佳</option>
+                  <option value="⚡ 充实高效">⚡ 充实高效</option>
+                  <option value="🌱 平稳推进">🌱 平稳推进</option>
+                  <option value="🔋 疲惫休养">🔋 疲惫休养</option>
+                  <option value="🌧 陷入低谷">🌧 陷入低谷</option>
+                </select>
+              </div>
+
+              <div class="flex items-center space-x-1.5">
+                <span class="text-xs text-stone-400">环境:</span>
+                <select id="journal-weather-select" onchange="saveManualJournal()" class="bg-stone-900 border border-stone-700 text-xs text-orange-300 rounded-lg px-2 py-1.5 outline-none">
+                  <option value="☀️ 晴朗温暖">☀️ 晴朗温暖</option>
+                  <option value="☁️ 多云沉静">☁️ 多云沉静</option>
+                  <option value="🌧 细雨润物">🌧 细雨润物</option>
+                  <option value="❄️ 寒冷专注">❄️ 寒冷专注</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <textarea id="manual-journal-textarea" oninput="debouncedSaveJournal()" placeholder="在此记录你今天的思考、心得、感悟或复盘..." class="w-full h-44 bg-stone-950/80 border border-stone-800 rounded-xl p-3 text-xs text-stone-100 placeholder-stone-500 focus:border-amber-500/60 outline-none resize-none font-sans leading-relaxed"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end space-x-2">
+              <button onclick="copyFullJournal()" class="px-3.5 py-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-200 text-xs font-bold transition flex items-center gap-1.5">
+                <i class="fa-solid fa-copy"></i><span>复制整篇日记</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 4: 完整卡库与数据库 (DATABASE BROWSER) -->
+    <div id="tab-db" class="tab-content hidden space-y-5">
+      <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-amber-500/25 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg sm:text-xl font-black text-amber-200 flex items-center gap-2 font-hextech">
+            <i class="fa-solid fa-boxes-stacked text-orange-400"></i> 165 张海克斯数据库
+          </h2>
+          <p class="text-xs text-stone-400 mt-1">浏览全部 55银 / 55金 / 55彩 海克斯强化规则</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="filterDbCards('all')" class="db-filter-btn active px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-stone-950">全部(165)</button>
+          <button onclick="filterDbCards('silver')" class="db-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-800 text-stone-300">🥈 银(55)</button>
+          <button onclick="filterDbCards('gold')" class="db-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-800 text-stone-300">🥇 金(55)</button>
+          <button onclick="filterDbCards('prismatic')" class="db-filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-800 text-stone-300">💎 彩(55)</button>
+        </div>
+      </div>
+
+      <div id="db-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- TAB 5: 双重结算 / 统计 (STATS) -->
+    <div id="tab-stats" class="tab-content hidden space-y-5">
+      <div class="glass-panel p-4 sm:p-6 rounded-2xl border border-amber-500/20 space-y-4">
+        <h2 class="text-lg font-bold text-amber-200 flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left text-orange-400"></i> 双重结算与现实战利品掉落
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-stone-950/80 p-4 rounded-xl border border-stone-800 space-y-2">
+            <div class="text-xs font-bold text-amber-300">🌙 每日小结算 (每晚 22:00)</div>
+            <p class="text-xs text-stone-400">结算当日完成率与海克斯倍率，掉落小鱼干、快乐水、游戏时长等奖励。</p>
+            <button onclick="triggerSettlement('daily')" class="w-full py-2.5 bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 text-amber-200 text-xs font-bold rounded-xl transition mt-2">
+              立即触发今日小结算
+            </button>
+          </div>
+          <div class="bg-stone-950/80 p-4 rounded-xl border border-stone-800 space-y-2">
+            <div class="text-xs font-bold text-rose-300">👑 每周终极大结算 (每周日)</div>
+            <p class="text-xs text-stone-400">汇总整周冒险战果，评定段位并开启周终极豪华大宝箱！</p>
+            <button onclick="triggerSettlement('weekly')" class="w-full py-2.5 bg-rose-500/20 border border-rose-500/50 hover:bg-rose-500/30 text-rose-200 text-xs font-bold rounded-xl transition mt-2">
+              立即触发本周大结算
+            </button>
+          </div>
+        </div>
+
+        <!-- Settlement Output Log -->
+        <div id="settlement-result-box" class="hidden bg-stone-950/90 border border-amber-500/40 rounded-2xl p-4 sm:p-5 space-y-3">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: 安卓 APP 化、API 连接配置与数据备份 (SETTINGS & ANDROID APP) -->
+    <div id="tab-settings" class="tab-content hidden space-y-5">
+      
+      <!-- Section 1: Gemini API Key Configuration -->
+      <div class="glass-panel p-4 sm:p-6 rounded-2xl border border-amber-500/30 space-y-4">
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h2 class="text-lg font-black text-amber-200 flex items-center gap-2 font-hextech">
+              <i class="fa-solid fa-key text-amber-400"></i> Gemini AI API 连接配置
+            </h2>
+            <p class="text-xs text-stone-400 mt-1">填入你的 Google Gemini API Key 后，手机端即可直接调用 AI 生成具体知识点任务、智能重随与日志评语。</p>
+          </div>
+          <span id="settings-api-badge" class="px-2.5 py-1 rounded-lg bg-stone-900 border border-stone-700 text-[11px] font-mono text-stone-400 shrink-0">未配置 Key</span>
+        </div>
+
+        <div class="space-y-3 bg-stone-950/80 p-4 rounded-xl border border-stone-800">
+          <div>
+            <label class="block text-xs font-bold text-amber-200 mb-1.5">Gemini API Key（仅保存在你手机本地存储，不会上传任何第三方服务器）</label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input id="gemini-api-key-input" type="password" placeholder="粘贴以 AIzaSy... 开头的 Gemini API Key" class="flex-1 bg-stone-900 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-xs text-stone-100 font-mono outline-none focus:border-amber-400">
+              <div class="flex gap-2">
+                <button type="button" onclick="toggleApiKeyVisibility()" class="px-3 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-bold">
+                  <i id="api-eye-icon" class="fa-solid fa-eye"></i>
+                </button>
+                <button type="button" onclick="saveGeminiApiKey()" class="hextech-button px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-stone-950 text-xs font-black">
+                  保存 Key
+                </button>
+                <button type="button" onclick="testGeminiApiConnection()" id="btn-test-api" class="px-4 py-2.5 rounded-xl bg-emerald-600/25 border border-emerald-500/50 text-emerald-300 text-xs font-bold hover:bg-emerald-600/35">
+                  测试连通性
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] text-stone-400 space-y-1 pt-1 border-t border-stone-800/80">
+            <div>💡 <strong class="text-amber-200">免费申请地址：</strong>访问 <span class="font-mono text-amber-300">aistudio.google.com/apikey</span> 登录 Google 账号即可免费创建 API Key。</div>
+            <div>🛡️ <strong class="text-amber-200">离线降级保护：</strong>即使不填 API Key 或手机处于无网络状态，内置的本地引擎依然可以正常生成任务与重随！</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Install on Android Phone (PWA & APK Guide) -->
+      <div class="glass-panel p-4 sm:p-6 rounded-2xl border border-amber-500/20 space-y-4">
+        <h2 class="text-lg font-black text-amber-200 flex items-center gap-2 font-hextech">
+          <i class="fa-brands fa-android text-emerald-400"></i> 安卓手机安装成独立 APP
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl bg-stone-950/80 border border-emerald-500/30 space-y-2.5">
+            <div class="text-xs font-black text-emerald-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-mobile-screen-button"></i> 方式一：一键安装桌面原生级 APP（推荐，零门槛）
+            </div>
+            <p class="text-xs text-stone-300 leading-relaxed">本程序已内置 PWA 移动端应用清单与离线图标。在安卓手机浏览器（推荐 Chrome / Edge / 小米浏览器）中打开本页面后，点击浏览器菜单的 <strong class="text-amber-300">「添加到主屏幕」</strong> 或 <strong class="text-amber-300">「安装应用」</strong>，即可在手机桌面生成独立图标、全屏无地址栏沉浸运行！</p>
+            <button id="btn-pwa-install" onclick="triggerPwaInstall()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition shadow-lg">
+              📲 唤起安卓桌面安装提示
+            </button>
+          </div>
+
+          <div class="p-4 rounded-xl bg-stone-950/80 border border-amber-500/25 space-y-2.5">
+            <div class="text-xs font-black text-amber-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-box-archive"></i> 方式二：导出离线单文件 / 打包 APK 安装包
+            </div>
+            <p class="text-xs text-stone-300 leading-relaxed">你可以一键导出包含当前所有进度的离线独立 HTML 包发到手机本地打开，或使用 Capacitor / Website 2 APK Builder 一键封装成标准 <code class="text-amber-300">.apk</code> 安装文件。</p>
+            <div class="flex gap-2">
+              <button onclick="exportBackupJson()" class="flex-1 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-200 text-xs font-bold border border-amber-500/30">
+                📤 导出存档备份
+              </button>
+              <label class="flex-1 py-2.5 rounded-xl bg-stone-800 hover:bg-stone-700 text-orange-200 text-xs font-bold border border-orange-500/30 text-center cursor-pointer">
+                📥 恢复存档备份
+                <input type="file" accept=".json" onchange="importBackupJson(event)" class="hidden">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- MOBILE BOTTOM NAVIGATION BAR (Android App Style) -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 glass-panel border-t border-amber-500/20 px-1 py-1.5 flex items-center justify-around shadow-2xl" style="padding-bottom: max(0.375rem, env(safe-area-inset-bottom));">
+    <button id="mnav-hub" onclick="switchTab('hub')" class="mtab-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-amber-300">
+      <i class="fa-solid fa-gamepad text-base"></i>
+      <span class="text-[10px] font-bold mt-0.5">中枢</span>
+    </button>
+    <button id="mnav-tasks" onclick="switchTab('tasks')" class="mtab-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-stone-400">
+      <i class="fa-solid fa-list-check text-base"></i>
+      <span class="text-[10px] font-bold mt-0.5">任务</span>
+    </button>
+    <button id="mnav-journal" onclick="switchTab('journal')" class="mtab-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-stone-400">
+      <i class="fa-solid fa-book-journal-whills text-base"></i>
+      <span class="text-[10px] font-bold mt-0.5">日志</span>
+    </button>
+    <button id="mnav-db" onclick="switchTab('db')" class="mtab-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-stone-400">
+      <i class="fa-solid fa-database text-base"></i>
+      <span class="text-[10px] font-bold mt-0.5">卡库</span>
+    </button>
+    <button id="mnav-stats" onclick="switchTab('stats')" class="mtab-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-stone-400">
+      <i class="fa-solid fa-trophy text-base"></i>
+      <span class="text-[10px] font-bold mt-0.5">结算</span>
+    </button>
+    <button id="mnav-settings" onclick="switchTab('settings')" class="mtab-btn flex flex-col items-center justify-center py-1 px-2 rounded-xl text-stone-400">
+      <i class="fa-solid fa-sliders text-base"></i>
+      <span class="text-[10px] font-bold mt-0.5">API/安装</span>
+    </button>
+  </nav>
+
+  <!-- MODAL: 手动/紧急导入任务 (Manual / Urgent Task Import Modal) -->
+  <div id="import-task-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel bg-stone-950 border border-amber-500/30 rounded-2xl max-w-md w-full p-6 space-y-4 relative shadow-2xl">
+      <button onclick="closeImportTaskModal()" class="absolute top-4 right-4 text-stone-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <h3 class="text-lg font-black text-amber-300 flex items-center gap-2 font-hextech">
+        <i class="fa-solid fa-bolt"></i> 导入新任务
+      </h3>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-stone-400 mb-1">任务优先级来源</label>
+          <select id="import-task-priority" class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 outline-none">
+            <option value="urgent">🚨 紧急导入 (最高优先级)</option>
+            <option value="today">📌 当天导入 (次高优先级)</option>
+            <option value="sunday">📅 周日预排 (常规计划)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-stone-400 mb-1">任务维度分类</label>
+          <select id="import-task-category" class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 outline-none">
+            <option value="study">📚 学习</option>
+            <option value="work">💼 工作</option>
+            <option value="sport">🏋️ 运动</option>
+            <option value="diet">🥗 饮食</option>
+            <option value="social">🤝 社交</option>
+            <option value="skill">🎨 技能</option>
+            <option value="life">🏠 生活</option>
+            <option value="sleep">🌙 睡眠</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-stone-400 mb-1">任务内容描述</label>
+          <input id="import-task-title" type="text" placeholder="例如：完成 AI Agent 核心架构原型验证" class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-stone-200 outline-none">
+        </div>
+      </div>
+      <div class="pt-2 flex justify-end gap-2">
+        <button onclick="closeImportTaskModal()" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300">取消</button>
+        <button onclick="submitImportedTask()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-black">确认导入</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Hextech Cards Selection Dialog -->
+  <div id="hextech-select-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="max-w-4xl w-full space-y-4 sm:space-y-6 text-center my-auto">
+      <div>
+        <div class="flex items-center justify-center gap-2 mb-2">
+          <div id="modal-round-badge" class="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold">
+            海克斯强化 阶段 1/3
+          </div>
+          <div id="modal-dedup-badge" class="px-3 py-1 rounded-full bg-stone-900 border border-amber-500/30 text-amber-200 text-xs font-mono">
+            🛡️ 同日严格去重
+          </div>
+        </div>
+        <h2 class="text-xl sm:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-100 via-amber-300 to-rose-300 font-hextech">
+          选择一项海克斯科技强化
+        </h2>
+        <p class="text-xs text-stone-400 mt-1">本轮 3 张卡牌阶级相同。每个槽位限刷新 1 次，换取同阶且今日未出现过的卡牌！</p>
+      </div>
+
+      <div id="hextech-cards-offer-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-16 md:bottom-5 right-4 left-4 sm:left-auto z-50 space-y-2 pointer-events-none flex flex-col items-center sm:items-end"></div>
+
+  <!-- MODAL: 单项任务重新随机（必须填写理由） -->
+  <div id="reroll-task-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-panel bg-stone-950 border border-amber-500/40 rounded-2xl max-w-md w-full p-5 sm:p-6 space-y-4 relative shadow-2xl">
+      <button type="button" onclick="closeRerollTaskModal()" class="absolute top-4 right-4 text-stone-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div>
+        <h3 class="text-lg font-black text-amber-200 flex items-center gap-2 font-hextech">
+          <i class="fa-solid fa-dice text-orange-400"></i> 申请重新随机当前任务
+        </h3>
+        <p class="text-xs text-stone-400 mt-1">海克斯法则：每次重随任务必须陈述正当理由，该理由将同步记入今日冒险日志。</p>
+      </div>
+
+      <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800 space-y-1">
+        <div id="reroll-target-cat" class="text-[11px] font-bold text-amber-300">任务类别</div>
+        <div id="reroll-target-title" class="text-xs text-stone-300 leading-relaxed">任务标题</div>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <label class="block font-bold text-amber-200">重新随机的理由 <span class="text-rose-400">*</span></label>
+        <div class="flex flex-wrap gap-1.5">
+          <button type="button" onclick="setQuickRerollReason('当前环境或设备条件受限，无法执行')" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px]">📍 环境/设备受限</button>
+          <button type="button" onclick="setQuickRerollReason('身体状态或精力不佳，需要调整节奏')" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px]">🔋 精力状态调整</button>
+          <button type="button" onclick="setQuickRerollReason('与今日临时日程冲突，换一个更契合的任务')" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px]">🗓️ 日程冲突微调</button>
+          <button type="button" onclick="setQuickRerollReason('想探索更有新鲜感与挑战性的具体方向')" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[11px]">✨ 追求更多新鲜感</button>
+        </div>
+        <textarea id="reroll-reason-input" rows="3" placeholder="请输入重新随机该任务的具体理由（至少 2 个字）..." class="w-full bg-stone-900 border border-amber-500/40 rounded-xl p-3 text-xs text-stone-100 placeholder-stone-500 focus:border-amber-400 outline-none resize-none"></textarea>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2">
+        <button type="button" onclick="closeRerollTaskModal()" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300">取消</button>
+        <button id="btn-confirm-reroll-task" type="button" onclick="confirmRerollSingleTask()" class="hextech-button px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-stone-950 text-xs font-black shadow-gold-glow">
+          确认理由并重随
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: 分类别独立随机方向生成 (Per-Category Random Direction Setup Modal) -->
+  <div id="per-category-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="glass-panel bg-stone-950 border border-amber-500/30 rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 relative shadow-2xl max-h-[90vh] flex flex-col">
+      <button type="button" onclick="closePerCategoryModal()" class="absolute top-4 right-4 text-stone-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div>
+        <h3 class="text-lg font-black text-amber-200 flex items-center gap-2 font-hextech">
+          <i class="fa-solid fa-wand-magic-sparkles text-orange-400"></i> 八大维度独立方向任务生成
+        </h3>
+        <p class="text-xs text-stone-400 mt-1">为每个任务类别单独指定方向（如“AI”、“荣格心理学”）或保持全随机，AI 将为你生成具体知识点与趣味任务。</p>
+      </div>
+      <div id="category-settings-rows" class="space-y-2.5 overflow-y-auto pr-1 flex-1">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="pt-3 border-t border-stone-800 flex flex-wrap items-center justify-between gap-2">
+        <button type="button" onclick="setAllCategoriesRandom()" class="px-3 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-amber-200 text-xs font-bold">
+          🎲 一键全部全随机
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closePerCategoryModal()" class="px-4 py-2 rounded-xl bg-stone-800 text-xs font-bold text-stone-300">取消</button>
+          <button id="btn-generate-cat-tasks" type="button" onclick="generateTasksFromCategories()" class="hextech-button px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-stone-950 text-xs font-black shadow-gold-glow flex items-center">
+            立即生成今日任务
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* ==========================================================================
+       0. DYNAMIC PWA MANIFEST & SERVICE WORKER FOR ANDROID INSTALLABILITY
+       ========================================================================== */
+    (function setupAndroidPwa() {
+      const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#f43f5e"/></linearGradient></defs><rect width="512" height="512" rx="112" fill="#14110f"/><polygon points="256,64 422,160 422,352 256,448 90,352 90,160" fill="none" stroke="url(#g)" stroke-width="28"/><polygon points="256,136 360,196 360,316 256,376 152,316 152,196" fill="url(#g)" opacity="0.88"/></svg>`;
+      const iconUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgIcon)));
+
+      const linkIcon = document.createElement('link');
+      linkIcon.rel = 'apple-touch-icon';
+      linkIcon.href = iconUrl;
+      document.head.appendChild(linkIcon);
+
+      const manifest = {
+        name: '人生海克斯 (Life Hextech)',
+        short_name: '人生海克斯',
+        description: '海克斯强化选择与每日成长任务冒险引擎',
+        start_url: '.',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#14110f',
+        theme_color: '#14110f',
+        icons: [
+          { src: iconUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' },
+          { src: iconUrl, sizes: '512x512', type: 'image/svg+xml', purpose: 'any maskable' }
+        ]
+      };
+      const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = URL.createObjectURL(manifestBlob);
+      document.head.appendChild(manifestLink);
+    })();
+
+    let deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+    });
+
+    async function triggerPwaInstall() {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        const choice = await deferredInstallPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          showToast('🎉 正在将「人生海克斯」安装到安卓主屏幕！');
+        }
+        deferredInstallPrompt = null;
+      } else {
+        showToast('📲 请点击手机浏览器右上角「⋮」菜单 -> 选择「添加到主屏幕」或「安装应用」即可生成桌面图标！');
+      }
+    }
+
+    /* ==========================================================================
+       1. DATA STRUCTURES & MASSIVE 165-CARD HEXTECH DATABASE
+       ========================================================================== */
+
+    const CATEGORIES = [
+      { id: 'study', name: '学习', icon: 'fa-book-open', tags: ['AI大模型', '荣格心理学', '博弈论', '外语口语'] },
+      { id: 'work', name: '工作', icon: 'fa-briefcase', tags: ['项目攻坚', '邮件文档', '流程优化', '高效沟通'] },
+      { id: 'sport', name: '运动', icon: 'fa-dumbbell', tags: ['核心力量', '有氧跑步', '体能训练', '拉伸休养'] },
+      { id: 'diet', name: '饮食', icon: 'fa-utensils', tags: ['低脂高蛋白', '多喝水2L', '轻食蔬果', '戒糖计划'] },
+      { id: 'social', name: '社交', icon: 'fa-users', tags: ['联系旧友', '倾听分享', '家庭交流', '社群互动'] },
+      { id: 'skill', name: '技能', icon: 'fa-code', tags: ['Python脚本', '乐器节奏', '绘画剪辑', '厨艺提升'] },
+      { id: 'life', name: '生活', icon: 'fa-house', tags: ['整理房间', '断舍离', '作息规律', '记账理财'] },
+      { id: 'sleep', name: '睡眠', icon: 'fa-moon', tags: ['23点前入睡', '睡前冥想', '无手机睡眠', '足浴放松'] }
+    ];
+
+    const HEXTECH_DATABASE = [
+      // ==================== 55 SILVER CARDS (HEX_S_01 - HEX_S_55) ====================
+      { id: 'HEX_S_01', tier: 'silver', name: '户外大冒险', icon: 'fa-person-hiking', desc: '【运动】任务替换为户外漫步或游玩任务，奖励 +20%。', lore: '把卡路里燃烧在温暖的阳光下！', effectType: 'sub_sport', value: 1.2 },
+      { id: 'HEX_S_02', tier: 'silver', name: '跨界融合', icon: 'fa-network-wired', desc: '【工作】时长可按 50% 折算计入【学习】时长。', lore: '在实战中吸收知识，效率翻倍。', effectType: 'cross_work_study', value: 0.5 },
+      { id: 'HEX_S_03', tier: 'silver', name: '极客降临', icon: 'fa-robot', desc: '包含 AI、代码或极客主题的任务，经验获取 +30%。', lore: '赛博时代的极客拥有专属经验光彩。', effectType: 'exp_tech', value: 1.3 },
+      { id: 'HEX_S_04', tier: 'silver', name: '零食犒赏', icon: 'fa-cookie-bite', desc: '完成任意【饮食】任务，直接解锁 1 份轻食零食奖励。', lore: '小小的奖励是持续前进的燃料。', effectType: 'snack_drop', value: 1 },
+      { id: 'HEX_S_05', tier: 'silver', name: '迷你魔杖', icon: 'fa-wand-magic', desc: '所有【学习】类任务经验获取提升 20%。', lore: '微弱但精准的魔法微光。', effectType: 'exp_study', value: 1.2 },
+      { id: 'HEX_S_06', tier: 'silver', name: '战利品发牌员', icon: 'fa-coins', desc: '每日完成前 2 项任务时，获得双倍积分奖励。', lore: '开局的发牌员总是特别慷慨。', effectType: 'double_first_two', value: 2.0 },
+      { id: 'HEX_S_07', tier: 'silver', name: '应急运力', icon: 'fa-truck-medical', desc: '若有未完成任务，每日扣分惩罚减少 50%。', lore: '即使有意外，也有后勤保障缓冲。', effectType: 'reduce_penalty', value: 0.5 },
+      { id: 'HEX_S_08', tier: 'silver', name: '活力冲刺', icon: 'fa-bolt-lightning', desc: '【运动】与【睡眠】类任务完成奖励增加 25%。', lore: '动静结合，身体充满充沛活力。', effectType: 'exp_health', value: 1.25 },
+      { id: 'HEX_S_09', tier: 'silver', name: '膳食纤维', icon: 'fa-apple-whole', desc: '【饮食】任务结算时额外获得健康勋章与 +25 积分。', lore: '绿色的食物带来清爽的一天。', effectType: 'bonus_diet', value: 25 },
+      { id: 'HEX_S_10', tier: 'silver', name: '专注光环', icon: 'fa-bullseye', desc: '【工作】类任务完成速度加快，积分 +15%。', lore: '消除杂念，将聚光灯打在当前目标上。', effectType: 'exp_work', value: 1.15 },
+      { id: 'HEX_S_11', tier: 'silver', name: '理财小助手', icon: 'fa-piggy-bank', desc: '结算基础利息提升 10%，积分积累更快。', lore: '积少成多，海克斯金库也在增值。', effectType: 'interest', value: 1.10 },
+      { id: 'HEX_S_12', tier: 'silver', name: '清心寡欲', icon: 'fa-spa', desc: '【生活】任务额外获得 15% 经验提升。', lore: '断舍离让心灵回归宁静。', effectType: 'exp_life', value: 1.15 },
+      { id: 'HEX_S_13', tier: 'silver', name: '咖啡因过载', icon: 'fa-mug-hot', desc: '上午 12:00 前完成的【工作】任务额外 +30 积分。', lore: '黑咖啡的香气驱动着机器运转。', effectType: 'morning_work', value: 30 },
+      { id: 'HEX_S_14', tier: 'silver', name: '补水达人', icon: 'fa-bottle-water', desc: '完成 2L 饮水任务，直接获得 +35 积分与保湿勋章。', lore: '水是生命与海克斯核心的源泉。', effectType: 'water_bonus', value: 35 },
+      { id: 'HEX_S_15', tier: 'silver', name: '深度睡眠', icon: 'fa-bed', desc: '完成【睡眠】任务后，次日获得 +1 额外刷新次数。', lore: '充足的修养是一切强化的基石。', effectType: 'sleep_reroll', value: 1 },
+      { id: 'HEX_S_16', tier: 'silver', name: '桌面整洁术', icon: 'fa-broom', desc: '完成【生活】桌面清理，直接获得 +40 经验值。', lore: '井井有条的环境能提升 200% 的思考效率。', effectType: 'clean_exp', value: 40 },
+      { id: 'HEX_S_17', tier: 'silver', name: '倾听者', icon: 'fa-ear-listen', desc: '【社交】倾听或交流任务奖励 +20 积分。', lore: '真诚的倾听是沟通最强大的武器。', effectType: 'listen_pts', value: 20 },
+      { id: 'HEX_S_18', tier: 'silver', name: '吉他初学者', icon: 'fa-music', desc: '【技能】练习乐器或艺术任务，经验 +30%。', lore: '琴弦上跳跃的是灵魂的律动。', effectType: 'music_exp', value: 1.3 },
+      { id: 'HEX_S_19', tier: 'silver', name: '站立办公', icon: 'fa-chair', desc: '结合【工作】与【运动】，今日获得 +30 站立健康分。', lore: '告别久坐，用双腿支撑你的事业。', effectType: 'stand_health', value: 30 },
+      { id: 'HEX_S_20', tier: 'silver', name: '阳光洗礼', icon: 'fa-sun', desc: '户外【运动】任务基础健康分翻倍。', lore: '吸收太阳的核聚变能量！', effectType: 'sun_double', value: 2.0 },
+      { id: 'HEX_S_21', tier: 'silver', name: '绿茶护体', icon: 'fa-leaf', desc: '【饮食】饮用绿茶，获得抗疲劳 Buff (+20% 专注力)。', lore: '茶多酚正在清除体内的氧化自由基。', effectType: 'tea_buff', value: 1.2 },
+      { id: 'HEX_S_22', tier: 'silver', name: '晚安小曲', icon: 'fa-headphones', desc: '睡前 30 分钟不看手机，【睡眠】经验 +50。', lore: '切断蓝光，迎接无梦的深沉睡眠。', effectType: 'no_phone_sleep', value: 50 },
+      { id: 'HEX_S_23', tier: 'silver', name: '步数达人', icon: 'fa-shoe-prints', desc: '今日行走达 6000 步，自动发放 +40 积分。', lore: '一步一步，丈量赛博都市的边缘。', effectType: 'steps_pts', value: 40 },
+      { id: 'HEX_S_24', tier: 'silver', name: '番茄工作法', icon: 'fa-stopwatch', desc: '【工作】采用 25m 番茄钟，任务额外收益 +20%。', lore: '时间被切割成精准的 25 分钟晶体。', effectType: 'pomodoro_boost', value: 1.2 },
+      { id: 'HEX_S_25', tier: 'silver', name: '快速备忘', icon: 'fa-note-sticky', desc: '5分钟内可完成的小【生活】任务直接结算。', lore: '随手搞定，绝不拖延。', effectType: 'quick_life', value: 1.0 },
+      { id: 'HEX_S_26', tier: 'silver', name: '快乐水轻享', icon: 'fa-glass-water', desc: '无糖零卡可乐不计入饮食惩罚，且 +15 积分。', lore: '气泡在舌尖炸裂，快乐无负担。', effectType: 'zero_coke', value: 15 },
+      { id: 'HEX_S_27', tier: 'silver', name: '微笑礼仪', icon: 'fa-smile', desc: '完成【社交】主动打招呼，获得 +15 社交活力。', lore: '微笑是通行全宇宙的硬通货。', effectType: 'smile_pts', value: 15 },
+      { id: 'HEX_S_28', tier: 'silver', name: '音符随行', icon: 'fa-compact-disc', desc: '【技能】练习音乐 15 分钟，获得 +35 经验。', lore: '声波交织成华丽的海克斯护盾。', effectType: 'music_15m', value: 35 },
+      { id: 'HEX_S_29', tier: 'silver', name: '早醒鸟', icon: 'fa-feather', desc: '8:00 前起床，【睡眠】任务奖励额外 +50 积分。', lore: '早起的鸟儿有海克斯晶石吃。', effectType: 'early_bird', value: 50 },
+      { id: 'HEX_S_30', tier: 'silver', name: '电子断舍离', icon: 'fa-mobile-retro', desc: '远离社交媒体 1 小时，【生活】任务 +60 经验。', lore: '退出噪音，找回属于自己的时间。', effectType: 'digital_detox', value: 60 },
+      { id: 'HEX_S_31', tier: 'silver', name: '坚果能量', icon: 'fa-bowl-food', desc: '【饮食】补充一把坚果，获得 +20 脑力积分。', lore: '优质油脂，为神经元加油。', effectType: 'nuts_pts', value: 20 },
+      { id: 'HEX_S_32', tier: 'silver', name: '伸展体操', icon: 'fa-child-reaching', desc: '完成 10 分钟拉伸，【运动】经验 +30。', lore: '拉伸筋骨，解除赛博疲劳。', effectType: 'stretch_exp', value: 30 },
+      { id: 'HEX_S_33', tier: 'silver', name: '读书笔记', icon: 'fa-book-bookmark', desc: '【学习】撰写 100 字笔记，获得 +40 积分。', lore: '落笔生花，知识真正融会贯通。', effectType: 'notes_pts', value: 40 },
+      { id: 'HEX_S_34', tier: 'silver', name: '代码重构', icon: 'fa-code-compare', desc: '【技能】重构或优化一段逻辑，经验 +50。', lore: '优雅的代码是工程师的浪漫。', effectType: 'refactor_exp', value: 50 },
+      { id: 'HEX_S_35', tier: 'silver', name: '友谊便笺', icon: 'fa-envelope-open-text', desc: '【社交】发送一条问候信息，获得 +25 积分。', lore: '一句话就能温暖冰冷的网络。', effectType: 'friend_msg', value: 25 },
+      { id: 'HEX_S_36', tier: 'silver', name: '水份饱和', icon: 'fa-droplet', desc: '【饮食】水份摄入达标，结算获得 +35 经验。', lore: '润物细无声。', effectType: 'hydration_exp', value: 35 },
+      { id: 'HEX_S_37', tier: 'silver', name: '护眼休憩', icon: 'fa-eye', desc: '看远方 20 秒护眼，获得 +25【生活】经验。', lore: '保护心灵的窗户。', effectType: 'eye_care', value: 25 },
+      { id: 'HEX_S_38', tier: 'silver', name: '睡前冥想', icon: 'fa-brain', desc: '【睡眠】前冥想 10 分钟，获得 +45 经验。', lore: '让狂暴的思想归于安宁。', effectType: 'meditate_exp', value: 45 },
+      { id: 'HEX_S_39', tier: 'silver', name: '整理书柜', icon: 'fa-book-shelves', desc: '【生活】整理书籍，直接 +30 积分。', lore: '书香门第的仪式感。', effectType: 'bookshelf_pts', value: 30 },
+      { id: 'HEX_S_40', tier: 'silver', name: '口语练习', icon: 'fa-language', desc: '【学习】练习外语口语 15 分钟，经验 +40。', lore: '打破语言的巴别塔。', effectType: 'speaking_exp', value: 40 },
+      { id: 'HEX_S_41', tier: 'silver', name: '散步思考', icon: 'fa-walkie-talkie', desc: '【运动】散步 20 分钟，获得 +30 脑力积分。', lore: '移动中的哲学家。', effectType: 'walk_think', value: 30 },
+      { id: 'HEX_S_42', tier: 'silver', name: '清空收件箱', icon: 'fa-inbox', desc: '【工作】收件箱归零，获得 +50 积分。', lore: '清爽无负荷。', effectType: 'inbox_zero', value: 50 },
+      { id: 'HEX_S_43', tier: 'silver', name: '低碳出行', icon: 'fa-bicycle', desc: '【生活】骑行或步行出行，经验 +35。', lore: '减少碳足迹。', effectType: 'green_travel', value: 35 },
+      { id: 'HEX_S_44', tier: 'silver', name: '蔬果沙拉', icon: 'fa-carrot', desc: '【饮食】吃一份新鲜蔬果，获得 +30 积分。', lore: '天然维生素炸弹。', effectType: 'fruit_pts', value: 30 },
+      { id: 'HEX_S_45', tier: 'silver', name: '日终复盘', icon: 'fa-clipboard-check', desc: '【工作】进行 5 分钟日终总结，获得 +40 经验。', lore: '每天进步一点点。', effectType: 'daily_review', value: 40 },
+      { id: 'HEX_S_46', tier: 'silver', name: '乐器试奏', icon: 'fa-guitar', desc: '【技能】练习乐器 20 分钟，获得 +45 积分。', lore: '奏响海克斯的乐章。', effectType: 'inst_pts', value: 45 },
+      { id: 'HEX_S_47', tier: 'silver', name: '关怀家人', icon: 'fa-heart', desc: '【社交】与家人通话 10 分钟，获得 +50 积分。', lore: '家是永远的避风港。', effectType: 'family_call', value: 50 },
+      { id: 'HEX_S_48', tier: 'silver', name: '准时准备', icon: 'fa-clock', desc: '【睡眠】22:30 开始睡前准备，获得 +60 经验。', lore: '规律作息的胜利。', effectType: 'sleep_prep', value: 60 },
+      { id: 'HEX_S_49', tier: 'silver', name: '纸质书阅读', icon: 'fa-book-open-reader', desc: '【学习】阅读纸质书 30 分钟，获得 +50 经验。', lore: '墨香与纸张的触感。', effectType: 'paper_book', value: 50 },
+      { id: 'HEX_S_50', tier: 'silver', name: '核心激活', icon: 'fa-dumbbell', desc: '【运动】做 30 个仰卧起坐，获得 +35 积分。', lore: '激活腹肌力量！', effectType: 'core_act', value: 35 },
+      { id: 'HEX_S_51', tier: 'silver', name: '无糖一日', icon: 'fa-ban-sugar', desc: '【饮食】整天不摄入附加糖，获得 +50 经验。', lore: '抗糖抗老第一步。', effectType: 'no_sugar_day', value: 50 },
+      { id: 'HEX_S_52', tier: 'silver', name: '键盘除尘', icon: 'fa-keyboard', desc: '【生活】清洁键盘与鼠标，获得 +30 积分。', lore: '生产力工具焕然一新。', effectType: 'clean_kb', value: 30 },
+      { id: 'HEX_S_53', tier: 'silver', name: '速写练习', icon: 'fa-paint-brush', desc: '【技能】画 15 分钟速写，获得 +40 经验。', lore: '用线条捕捉瞬间。', effectType: 'sketch_exp', value: 40 },
+      { id: 'HEX_S_54', tier: 'silver', name: '邻里问候', icon: 'fa-handshake', desc: '【社交】给邻居或同事递个微笑，获得 +20 积分。', lore: '构建和谐赛博社区。', effectType: 'neighbor_pts', value: 20 },
+      { id: 'HEX_S_55', tier: 'silver', name: '热脚养生', icon: 'fa-bath', desc: '【睡眠】睡前泡脚 15 分钟，获得 +40 积分。', lore: '血液循环，一夜好眠。', effectType: 'foot_bath', value: 40 },
+
+      // ==================== 55 GOLD CARDS (HEX_G_01 - HEX_G_55) ====================
+      { id: 'HEX_G_01', tier: 'gold', name: '恶魔契约', icon: 'fa-file-contract', desc: '每日多生成 1 个高难急件任务，但完成奖励提升 100%。', lore: '高风险，超高回报！', effectType: 'extra_urgent', value: 2.0 },
+      { id: 'HEX_G_02', tier: 'gold', name: '好事成双', icon: 'fa-clone', desc: '每日可选择复制 1 项已完成任务的奖励。', lore: '双倍的快乐，双倍的满足。', effectType: 'duplicate_reward', value: 1 },
+      { id: 'HEX_G_03', tier: 'gold', name: '利滚利', icon: 'fa-chart-line-up', desc: '结算时若积分 > 500，额外获得 50% 利息收益。', lore: '让海克斯金库为你自动打工。', effectType: 'rich_interest', value: 0.5 },
+      { id: 'HEX_G_04', tier: 'gold', name: '黄金门票', icon: 'fa-ticket-simple', desc: '刷新海克斯或任务时，有 50% 概率不消耗刷新限制。', lore: '头等舱贵宾的尊贵特权。', effectType: 'free_reroll', value: 0.5 },
+      { id: 'HEX_G_05', tier: 'gold', name: '大剑士护手', icon: 'fa-hand-fist', desc: '【运动】类任务奖励直接翻倍。', lore: '力量在手臂中沸腾！', effectType: 'double_sport', value: 2.0 },
+      { id: 'HEX_G_06', tier: 'gold', name: '社交达人', icon: 'fa-comments', desc: '【社交】与【技能】任务额外增加 40% 综合得分。', lore: '无论在职场还是社群，你都是焦点。', effectType: 'bonus_social', value: 1.4 },
+      { id: 'HEX_G_07', tier: 'gold', name: '赏金猎人', icon: 'fa-sack-dollar', desc: '每连续完成 3 项任务，自动掉落一个战利品宝箱。', lore: '锁定目标，收割赏金！', effectType: 'bounty_box', value: 3 },
+      { id: 'HEX_G_08', tier: 'gold', name: '早起鸟儿', icon: 'fa-sun', desc: '如果在 12:00 前完成任意 2 项任务，今日全收益 +30%。', lore: '抢占先机的人掌控全局。', effectType: 'morning_boost', value: 1.3 },
+      { id: 'HEX_G_09', tier: 'gold', name: '跨领域大师', icon: 'fa-graduation-cap', desc: '【学习】时长可 100% 折算为【技能】提升点数。', lore: '理论与实践的完美统一。', effectType: 'study_to_skill', value: 1.0 },
+      { id: 'HEX_G_10', tier: 'gold', name: '游乐场兑换券', icon: 'fa-gamepad', desc: '完成今日任意 3 项任务，直接解锁 1 小时游戏时长奖励！', lore: '劳逸结合是海克斯科学的核心。', effectType: 'game_ticket', value: 1.0 },
+      { id: 'HEX_G_11', tier: 'gold', name: '终极美食家', icon: 'fa-burger', desc: '【饮食】任务达标，解锁 1 次放纵餐或高品质零食特权。', lore: '美食是对灵魂最深沉的抚慰。', effectType: 'cheat_meal', value: 1.0 },
+      { id: 'HEX_G_12', tier: 'gold', name: '运动狂热', icon: 'fa-fire-flame-curved', desc: '【运动】任务获得的经验值提升 80%。', lore: '让汗水如海克斯能量般挥撒。', effectType: 'sport_80', value: 1.8 },
+      { id: 'HEX_G_13', tier: 'gold', name: '程序员的咖啡', icon: 'fa-mug-saucer', desc: '【工作】任务产出增加 75%，并附赠能量加速。', lore: '将咖啡因转化为无瑕代码。', effectType: 'work_75', value: 1.75 },
+      { id: 'HEX_G_14', tier: 'gold', name: '社交花蝴蝶', icon: 'fa-comments-dollar', desc: '【社交】类任务完成奖励翻倍。', lore: '游刃有余，结交八方好友。', effectType: 'double_social', value: 2.0 },
+      { id: 'HEX_G_15', tier: 'gold', name: '技能大爆发', icon: 'fa-lightbulb', desc: '【技能】类任务奖励提升 100%。', lore: '灵感如闪电划过夜空！', effectType: 'double_skill', value: 2.0 },
+      { id: 'HEX_G_16', tier: 'gold', name: '极简主义', icon: 'fa-box-open', desc: '【生活】类任务完成计为双倍完成度。', lore: '精简你的生活，丰富你的灵魂。', effectType: 'double_life', value: 2.0 },
+      { id: 'HEX_G_17', tier: 'gold', name: '婴儿般睡眠', icon: 'fa-cloud-moon', desc: '【睡眠】质量达到优良，额外获得 +100 经验。', lore: '一觉到天亮，焕发新生。', effectType: 'sleep_100', value: 100 },
+      { id: 'HEX_G_18', tier: 'gold', name: '双倍快乐包', icon: 'fa-gift', desc: '小结算时直接解锁：1包小鱼干 + 1瓶可乐奖励！', lore: '经典的双倍快乐搭配。', effectType: 'snack_pack', value: 1.0 },
+      { id: 'HEX_G_19', tier: 'gold', name: '连胜节奏', icon: 'fa-chart-line', desc: '连续完成 4 项任务，额外暴击奖励 +150 积分。', lore: '势不可挡的连发节奏！', effectType: 'streak_150', value: 150 },
+      { id: 'HEX_G_20', tier: 'gold', name: '应急避险', icon: 'fa-shield-heart', desc: '可免除 1 项未完成任务的全部失败扣除。', lore: '海克斯安全气囊已弹出。', effectType: 'shield_one', value: 1.0 },
+      { id: 'HEX_G_21', tier: 'gold', name: '知识库跃迁', icon: 'fa-book-atlas', desc: '【学习】累计达 2 小时，直接获得 +150 额外经验。', lore: '量变引发质的飞跃。', effectType: 'study_2h', value: 150 },
+      { id: 'HEX_G_22', tier: 'gold', name: '健身房驻扎', icon: 'fa-dumbbell', desc: '【运动】达 1 小时，获得 +150 运动积分。', lore: '泵感十足的黄金一小时。', effectType: 'sport_1h', value: 150 },
+      { id: 'HEX_G_23', tier: 'gold', name: '黄金日记本', icon: 'fa-book-journal-whills', desc: '每日撰写冒险手记，直接获得 +100 经验奖励！', lore: '文字记录着通往王者的足迹。', effectType: 'journal_100', value: 100 },
+      { id: 'HEX_G_24', tier: 'gold', name: 'AI 助教', icon: 'fa-brain', desc: '使用 AI 工具辅助完成【工作/学习】，收益 2x。', lore: '碳基智慧与硅基算力的结合。', effectType: 'ai_assistant', value: 2.0 },
+      { id: 'HEX_G_25', tier: 'gold', name: '跨界歌王', icon: 'fa-microphone-lines', desc: '【技能】练习音乐，直接解锁 30 分钟视频看剧时长。', lore: '用声音征服海克斯舞台。', effectType: 'music_video', value: 30 },
+      { id: 'HEX_G_26', tier: 'gold', name: '厨艺大赏', icon: 'fa-kitchen-set', desc: '【饮食】亲自下厨做饭，获得 +100 积分与美食家勋章。', lore: '烟火气中最动人的温度。', effectType: 'cook_meal', value: 100 },
+      { id: 'HEX_G_27', tier: 'gold', name: '深夜守护者', icon: 'fa-moon-stars', desc: '23:00 前准时入睡，【睡眠】获得 +100 经验值。', lore: '守护你的生物钟与发际线。', effectType: 'sleep_23', value: 100 },
+      { id: 'HEX_G_28', tier: 'gold', name: '破冰前锋', icon: 'fa-handshake-angle', desc: '【社交】结识新朋友或深聊，获得 +120 积分。', lore: '打破冷漠的坚冰。', effectType: 'ice_breaker', value: 120 },
+      { id: 'HEX_G_29', tier: 'gold', name: '全能替补', icon: 'fa-arrows-rotate', desc: '可自由更换 1 项今日不喜欢的任务类型。', lore: '灵活应变是智者的品质。', effectType: 'swap_task', value: 1.0 },
+      { id: 'HEX_G_30', tier: 'gold', name: '储蓄罐爆满', icon: 'fa-vault', desc: '基础积分保底 +50 积分。', lore: '海克斯金库日渐充盈。', effectType: 'vault_50', value: 50 },
+      { id: 'HEX_G_31', tier: 'gold', name: '疯狂番茄', icon: 'fa-apple-crate', desc: '【工作】完成 4 个番茄钟，获得 +120 经验。', lore: '专注的能量不断积聚。', effectType: 'tomato_4', value: 120 },
+      { id: 'HEX_G_32', tier: 'gold', name: '户外马拉松', icon: 'fa-person-running', desc: '【运动】跑完 5 公里，获得 +200 积分大奖！', lore: '超越肉体极限的欢愉。', effectType: 'run_5k', value: 200 },
+      { id: 'HEX_G_33', tier: 'gold', name: '读书马拉松', icon: 'fa-book-bookmark', desc: '【学习】阅读 50 页，获得 +180 经验。', lore: '沉浸在思想的海洋。', effectType: 'read_50p', value: 180 },
+      { id: 'HEX_G_34', tier: 'gold', name: '游戏狂欢', icon: 'fa-gamepad font-bold', desc: '完成 5 项任务，解锁 2 小时游戏时长奖励！', lore: '畅玩毫无内疚感！', effectType: 'game_2h', value: 2.0 },
+      { id: 'HEX_G_35', tier: 'gold', name: '视频通宵卷', icon: 'fa-tv', desc: '小结算时解锁 1.5 小时长视频追剧卡。', lore: '大屏观影，彻底放松。', effectType: 'video_15h', value: 1.5 },
+      { id: 'HEX_G_36', tier: 'gold', name: '暴击时刻', icon: 'fa-dice', desc: '完成任务时有 20% 概率触发 3 倍积分暴击！', lore: '运气也是实力的一部分。', effectType: 'crit_20', value: 3.0 },
+      { id: 'HEX_G_37', tier: 'gold', name: '绝地反击', icon: 'fa-shield-halved', desc: '若 18:00 前完成少于 2 项，晚间任务收益翻倍！', lore: '翻盘的号角在黄昏吹响。', effectType: 'comeback', value: 2.0 },
+      { id: 'HEX_G_38', tier: 'gold', name: '阳光能量卡', icon: 'fa-sun-plant-wilt', desc: '进行 30 分钟日光浴/户外，+80 健康积分。', lore: '光合作用正在发生。', effectType: 'sun_80', value: 80 },
+      { id: 'HEX_G_39', tier: 'gold', name: '高蛋白轰炸', icon: 'fa-egg', desc: '【饮食】摄入 80g 优质蛋白，经验 +90。', lore: '肌肉撕裂后的最佳补给。', effectType: 'protein_90', value: 90 },
+      { id: 'HEX_G_40', tier: 'gold', name: '团队领袖', icon: 'fa-people-group', desc: '【工作】主持或主导讨论，获得 +100 积分。', lore: '带领队伍走向胜利。', effectType: 'lead_work', value: 100 },
+      { id: 'HEX_G_41', tier: 'gold', name: '创作者手记', icon: 'fa-pen-nib', desc: '【技能】发布一篇文章或作品，经验 +110。', lore: '向世界展示你的产出。', effectType: 'publish_art', value: 110 },
+      { id: 'HEX_G_42', tier: 'gold', name: '全屋大扫除', icon: 'fa-pump-soap', desc: '【生活】完成房间深度打扫，获得 +120 积分。', lore: '打扫房间即打扫心灵。', effectType: 'deep_clean', value: 120 },
+      { id: 'HEX_G_43', tier: 'gold', name: '深度无打扰', icon: 'fa-bell-slash', desc: '【工作】连续 2 小时静音无手机，经验 +130。', lore: '进入极致的 Flow 状态。', effectType: 'flow_state', value: 130 },
+      { id: 'HEX_G_44', tier: 'gold', name: '英语角开张', icon: 'fa-comments-dollar', desc: '【学习】英语交流 30 分钟，获得 +100 积分。', lore: '自信流利的赛博口语。', effectType: 'english_corner', value: 100 },
+      { id: 'HEX_G_45', tier: 'gold', name: '呼朋唤友', icon: 'fa-wine-glass', desc: '【社交】参加线下聚会或餐局，获得 +150 积分。', lore: '举杯欢庆，共享时光。', effectType: 'party_150', value: 150 },
+      { id: 'HEX_G_46', tier: 'gold', name: '核心击穿', icon: 'fa-child-reaching', desc: '【运动】进行 20 分钟 Core 核心训练，经验 +100。', lore: '收紧核心，稳如磐石。', effectType: 'core_100', value: 100 },
+      { id: 'HEX_G_47', tier: 'gold', name: '低糖奇迹', icon: 'fa-shield-virus', desc: '【饮食】全天严格控糖，获得 +120 经验。', lore: '胰岛素水平非常平稳。', effectType: 'low_sugar', value: 120 },
+      { id: 'HEX_G_48', tier: 'gold', name: '晚间仪式感', icon: 'fa-candle-holder', desc: '【睡眠】睡前看书 20 分钟，获得 +90 积分。', lore: '用书香抚平一天的浮躁。', effectType: 'night_ritual', value: 90 },
+      { id: 'HEX_G_49', tier: 'gold', name: '极速发牌', icon: 'fa-rotate', desc: '直接获得 +2 次海克斯卡牌刷新限制！', lore: '发牌员为你重新洗牌。', effectType: 'extra_rerolls', value: 2.0 },
+      { id: 'HEX_G_50', tier: 'gold', name: '经验储蓄卡', icon: 'fa-piggy-bank font-bold', desc: '将今日 100 经验直接存入下周大结算！', lore: '为未来的胜利积蓄力量。', effectType: 'bank_exp', value: 100 },
+      { id: 'HEX_G_51', tier: 'gold', name: '技能合成器', icon: 'fa-cubes', desc: '合并 2 项技能任务，完成后解锁史诗级奖励！', lore: '跨界技能融合产生裂变。', effectType: 'merge_skill', value: 1.0 },
+      { id: 'HEX_G_52', tier: 'gold', name: '社交达人Ⅱ', icon: 'fa-user-group', desc: '社交连击，免费解锁零食礼盒。', lore: '友谊的甜美果实。', effectType: 'social_snack', value: 1.0 },
+      { id: 'HEX_G_53', tier: 'gold', name: '零食大礼包', icon: 'fa-box', desc: '小结算时直接解锁 2 份高端零食体验！', lore: '零食自由的快乐。', effectType: 'snack_pack2', value: 2.0 },
+      { id: 'HEX_G_54', tier: 'gold', name: '视频通畅卡', icon: 'fa-play font-bold', desc: '解锁 2 小时 Bilibili/YouTube 观影卡。', lore: '精彩视频看个够。', effectType: 'video_2h', value: 2.0 },
+      { id: 'HEX_G_55', tier: 'gold', name: '睡神降临', icon: 'fa-moon', desc: '【睡眠】睡足 8 小时，直接获得 +150 经验。', lore: '充饱电的赛博战士。', effectType: 'sleep_8h', value: 150 },
+
+      // ==================== 55 PRISMATIC CARDS (HEX_P_01 - HEX_P_55) ====================
+      { id: 'HEX_P_01', tier: 'prismatic', name: '升级咯！', icon: 'fa-angles-up', desc: '直接获得 1000 经验值，并将今日所有任务加成提升至最高！', lore: '经验狂飙，直达巅峰！', effectType: 'instant_exp', value: 1000 },
+      { id: 'HEX_P_02', tier: 'prismatic', name: '诅咒之冠', icon: 'fa-crown', desc: '今日所有任务基础奖励 +200%，但失败扣除双倍积分。', lore: '戴冠者，必承其重。', effectType: 'high_risk', value: 3.0 },
+      { id: 'HEX_P_03', tier: 'prismatic', name: '海克斯大脑', icon: 'fa-brain-circuit', desc: 'AI 全程监控路径，所有类别任务结算额外 *1.8 倍！', lore: '硅基大导师在为你精确演算。', effectType: 'ai_mastery', value: 1.8 },
+      { id: 'HEX_P_04', tier: 'prismatic', name: '棱彩梦境', icon: 'fa-gem', desc: '自动完成 1 项最困难任务，并随机解锁 1 个彩蛋成就！', lore: '梦境映照现实，奇迹发生。', effectType: 'auto_complete', value: 1.0 },
+      { id: 'HEX_P_05', tier: 'prismatic', name: '运筹帷幄', icon: 'fa-chess-king', desc: '急件与周计划任务经验提升至 300%。', lore: '千里之外，决胜时刻。', effectType: 'triple_plan', value: 3.0 },
+      { id: 'HEX_P_06', tier: 'prismatic', name: '黄金军团', icon: 'fa-shield-cat', desc: '今日每完成一个任务，自动增加 100 宝箱进度！', lore: '宝箱大军浩浩荡荡而来。', effectType: 'chest_master', value: 100 },
+      { id: 'HEX_P_07', tier: 'prismatic', name: '降维打击', icon: 'fa-wand-magic-sparkles', desc: '将所有 8 个日常任务改写为史诗超级奖励模式！', lore: '用绝对的优势碾压困难。', effectType: 'epic_rewrite', value: 8.0 },
+      { id: 'HEX_P_08', tier: 'prismatic', name: '无限火力', icon: 'fa-fire font-black', desc: '任务冷却为0，完成任何微小习惯均获得暴击 PTS！', lore: '倾泻你的海克斯活力！', effectType: 'rapid_fire', value: 1.0 },
+      { id: 'HEX_P_09', tier: 'prismatic', name: '黄金黄金海克斯', icon: 'fa-award', desc: '本周后续所有抽取强化均免费升阶为彩金品质！', lore: '全场闪耀着棱彩的光芒。', effectType: 'all_prismatic', value: 1.0 },
+      { id: 'HEX_P_10', tier: 'prismatic', name: '终极自由日', icon: 'fa-champagne-glasses', desc: '直接解锁：5小时游戏 + 3份零食 + 1顿大餐特权！', lore: '今天是属于英雄的狂欢日！', effectType: 'freedom_day', value: 1.0 },
+      { id: 'HEX_P_11', tier: 'prismatic', name: '人生赢家', icon: 'fa-trophy', desc: '完成全 8 维度任务，获得 +500 积分与直接升 1 级！', lore: '八面玲珑，全方位无死角。', effectType: 'winner_all', value: 500 },
+      { id: 'HEX_P_12', tier: 'prismatic', name: '赛博之体', icon: 'fa-heart-pulse', desc: '【运动】与【睡眠】组合产出 3 倍健康积分。', lore: '打造坚不可摧的钢铁躯体。', effectType: 'cyber_body', value: 3.0 },
+      { id: 'HEX_P_13', tier: 'prismatic', name: '创世图书库', icon: 'fa-book-atlas', desc: '【学习】任务全部完成，直接解锁 +500 额外经验。', lore: '人类智慧的宝库为你敞开。', effectType: 'library_500', value: 500 },
+      { id: 'HEX_P_14', tier: 'prismatic', name: '华尔街之狼', icon: 'fa-sack-dollar', desc: '【工作】任务完成获得 +400 积分与双倍利息。', lore: '掌控经济命脉。', effectType: 'wall_street', value: 400 },
+      { id: 'HEX_P_15', tier: 'prismatic', name: '社交沙皇', icon: 'fa-crown font-bold', desc: '【社交】任务完成解锁史诗级人脉羁绊勋章。', lore: '你就是赛博社交网络的枢纽。', effectType: 'czar_social', value: 1.0 },
+      { id: 'HEX_P_16', tier: 'prismatic', name: '宗师技能', icon: 'fa-user-ninja', desc: '【技能】任务获得宗师认证，经验 +300。', lore: '技近乎道，登峰造极。', effectType: 'master_skill', value: 300 },
+      { id: 'HEX_P_17', tier: 'prismatic', name: '圣人模式', icon: 'fa-yin-yang', desc: '【饮食+生活】全天无坏习惯，直接 +400 经验！', lore: '身心澄澈，天人合一。', effectType: 'saint_mode', value: 400 },
+      { id: 'HEX_P_18', tier: 'prismatic', name: '时光倒流', icon: 'fa-clock-rotate-left', desc: '可重新补签或重做昨日未完成的任意 1 项任务！', lore: '掌控时间的法则。', effectType: 'time_rewind', value: 1.0 },
+      { id: 'HEX_P_19', tier: 'prismatic', name: '幸运女神', icon: 'fa-clover', desc: '战利品宝箱 100% 掉落最高品质棱彩大奖！', lore: '幸运女神在向你倾城一笑。', effectType: 'lady_luck', value: 1.0 },
+      { id: 'HEX_P_20', tier: 'prismatic', name: '满级玩家', icon: 'fa-star font-bold', desc: '永久提升所有任务基础收益 +20%。', lore: '王者风范，终身受益。', effectType: 'perm_20', value: 1.2 },
+      { id: 'HEX_P_21', tier: 'prismatic', name: '狂暴战士', icon: 'fa-dumbbell font-bold', desc: '【运动】任务获得 4 倍暴击经验！', lore: '血脉喷张的狂暴能量！', effectType: 'berserk_sport', value: 4.0 },
+      { id: 'HEX_P_22', tier: 'prismatic', name: '学霸附体', icon: 'fa-graduation-cap font-bold', desc: '【学习】任务获得 4 倍暴击经验！', lore: '文曲星降临赛博都市。', effectType: 'scholar_4x', value: 4.0 },
+      { id: 'HEX_P_23', tier: 'prismatic', name: '工作狂人', icon: 'fa-briefcase font-bold', desc: '【工作】任务获得 4 倍暴击积分！', lore: '高效产出的机器。', effectType: 'workaholic_4x', value: 4.0 },
+      { id: 'HEX_P_24', tier: 'prismatic', name: '厨神下凡', icon: 'fa-utensils font-bold', desc: '【饮食】任务解锁顶级美餐饮食特权！', lore: '舌尖上的海克斯饕餮。', effectType: 'god_cook', value: 1.0 },
+      { id: 'HEX_P_25', tier: 'prismatic', name: '睡眠圣王', icon: 'fa-bed font-bold', desc: '【睡眠】获得 4 倍经验并清除全部身体疲劳。', lore: '灵魂深处的彻底洗涤。', effectType: 'sleep_king', value: 4.0 },
+      { id: 'HEX_P_26', tier: 'prismatic', name: '全能神王', icon: 'fa-gem font-bold', desc: '8大类别各做1项，直接解锁终极至尊宝箱！', lore: '全知全能的至尊形态。', effectType: 'god_king', value: 1.0 },
+      { id: 'HEX_P_27', tier: 'prismatic', name: '双城之战', icon: 'fa-city', desc: '【工作】与【学习】进度同步，双向获得双倍奖励！', lore: '皮城与祖安的海克斯共鸣。', effectType: 'arcane_sync', value: 2.0 },
+      { id: 'HEX_P_28', tier: 'prismatic', name: '海克斯核心', icon: 'fa-atom', desc: '海克斯阶段等级直接提升 +2 级！', lore: '核心能量突破临界点！', effectType: 'core_plus2', value: 2.0 },
+      { id: 'HEX_P_29', tier: 'prismatic', name: '命运轮盘', icon: 'fa-dharmachakra', desc: '从至尊奖池中随机抽取 3 项顶级现实奖励！', lore: '转动吧，命运的齿轮！', effectType: 'wheel_destiny', value: 3.0 },
+      { id: 'HEX_P_30', tier: 'prismatic', name: '自由翱翔', icon: 'fa-plane-departure', desc: '将 1 项【工作】替换为 2 小时自由娱乐卡！', lore: '给灵魂放个假。', effectType: 'free_fly', value: 2.0 },
+      { id: 'HEX_P_31', tier: 'prismatic', name: '能量过载', icon: 'fa-bolt font-bold', desc: '未来 3 天经验获取收益保持 200%！', lore: '超频运转，势不可挡。', effectType: 'overload_3d', value: 2.0 },
+      { id: 'HEX_P_32', tier: 'prismatic', name: '丰收祭典', icon: 'fa-wheat-awn', desc: '结算时所有奖励数量乘以 2.5 倍！', lore: '硕果累累的丰收季节。', effectType: 'harvest_25', value: 2.5 },
+      { id: 'HEX_P_33', tier: 'prismatic', name: '绝对专注', icon: 'fa-glasses', desc: '【工作】任务耗费时间减半，得分翻倍！', lore: '降维式的专注效率。', effectType: 'abs_focus', value: 2.0 },
+      { id: 'HEX_P_34', tier: 'prismatic', name: '钢铁神经', icon: 'fa-shield', desc: '本周内任何未完成任务均免受扣分！', lore: '钢铁般的意志，无所畏惧。', effectType: 'iron_nerves', value: 1.0 },
+      { id: 'HEX_P_35', tier: 'prismatic', name: '终极社交花蝴蝶', icon: 'fa-handshake-simple', desc: '【社交】与3人互动，解锁丰盛大餐特权！', lore: '社交场上的无冕之王。', effectType: 'czar_party', value: 1.0 },
+      { id: 'HEX_P_36', tier: 'prismatic', name: '达芬奇全才', icon: 'fa-palette', desc: '【技能】与【学习】获得双倍复合奖励。', lore: '文艺复兴式的全才巨擘。', effectType: 'davinci_all', value: 2.0 },
+      { id: 'HEX_P_37', tier: 'prismatic', name: '晨曦之光', icon: 'fa-sun-around', desc: '10:00 前完成 3 项任务，获得 +300 积分！', lore: '晨曦破晓时的第一缕曙光。', effectType: 'dawn_300', value: 300 },
+      { id: 'HEX_P_38', tier: 'prismatic', name: '夜神庇佑', icon: 'fa-moon font-bold', desc: '22:00 前入睡，+300 经验并赠送 2 次刷新！', lore: '夜神为你披上梦境斗篷。', effectType: 'night_god', value: 300 },
+      { id: 'HEX_P_39', tier: 'prismatic', name: '零食自由', icon: 'fa-cookie', desc: '解锁今日无限零食享用特权（无内疚卡）！', lore: '快乐无罪，零食自由！', effectType: 'snack_free', value: 1.0 },
+      { id: 'HEX_P_40', tier: 'prismatic', name: '游戏畅玩卡', icon: 'fa-gamepad font-black', desc: '直接解锁 4 小时 Steam/主机游戏通宵卡！', lore: '在虚拟世界里征战沙场！', effectType: 'game_4h', value: 4.0 },
+      { id: 'HEX_P_41', tier: 'prismatic', name: '影音全通卡', icon: 'fa-film', desc: '解锁 3 小时电影院或追剧爆米花时长！', lore: '沉浸式光影盛宴。', effectType: 'movie_3h', value: 3.0 },
+      { id: 'HEX_P_42', tier: 'prismatic', name: '积分大爆炸', icon: 'fa-burst', desc: '基础积分池瞬间暴增 +300 积分！', lore: '海克斯晶体发生连锁聚变！', effectType: 'pts_burst', value: 300 },
+      { id: 'HEX_P_43', tier: 'prismatic', name: '彩虹宝箱', icon: 'fa-box-open font-bold', desc: '立即掉落 1 个棱彩 Supreme 战利品箱！', lore: '七彩华光璀璨夺目。', effectType: 'rainbow_chest', value: 1.0 },
+      { id: 'HEX_P_44', tier: 'prismatic', name: '灵魂升华', icon: 'fa-feather-pointed', desc: '撰写日志获得 +250 经验与 AI 灵魂加持！', lore: '文字是灵魂升华的阶梯。', effectType: 'journal_250', value: 250 },
+      { id: 'HEX_P_45', tier: 'prismatic', name: '巅峰状态', icon: 'fa-mountain', desc: '今日全部任务完成，直接提升 1 个玩家等级！', lore: '站在人生的最高峰览胜。', effectType: 'peak_state', value: 1.0 },
+      { id: 'HEX_P_46', tier: 'prismatic', name: '跨时空交响', icon: 'fa-infinity', desc: '【工作】时长同时折算为【学习】与【技能】！', lore: '一石三鸟的究极工作法。', effectType: 'triple_cross', value: 1.0 },
+      { id: 'HEX_P_47', tier: 'prismatic', name: '极速飞升', icon: 'fa-rocket', desc: '当前等级经验条进度直接填充 50%！', lore: '注入高纯度海克斯能量。', effectType: 'exp_50pct', value: 0.5 },
+      { id: 'HEX_P_48', tier: 'prismatic', name: '不朽者', icon: 'fa-shield-cat font-bold', desc: '保留今日所有已选海克斯 Buff，带入明天！', lore: '不朽的能力跨越昼夜。', effectType: 'immortal_buffs', value: 1.0 },
+      { id: 'HEX_P_49', tier: 'prismatic', name: '海克斯风暴', icon: 'fa-tornado', desc: '重置今日任务为全传奇加成模式！', lore: '风暴过处，万物革新。', effectType: 'hex_storm', value: 1.0 },
+      { id: 'HEX_P_50', tier: 'prismatic', name: '终极减脂', icon: 'fa-fire', desc: '【饮食+运动】获得终极健身勋章与 +350 经验。', lore: '脂质彻底燃烧为能量！', effectType: 'ultimate_fit', value: 350 },
+      { id: 'HEX_P_51', tier: 'prismatic', name: '智慧光环', icon: 'fa-lightbulb font-bold', desc: '【学习】速度 x3，并奖励 +200 积分。', lore: '智慧的光芒照亮前路。', effectType: 'wisdom_3x', value: 3.0 },
+      { id: 'HEX_P_52', tier: 'prismatic', name: '巨魔之王', icon: 'fa-gavel', desc: '【工作】快捷捷径：用 AI 完成即得 +250 积分！', lore: '聪明地工作，而不是辛苦地工作。', effectType: 'troll_king', value: 250 },
+      { id: 'HEX_P_53', tier: 'prismatic', name: '快乐源泉', icon: 'fa-mug-hot font-bold', desc: '解锁 1 杯奶茶 + 2 小时游戏快乐特权！', lore: '糖分与游戏的双重暴击。', effectType: 'happy_source', value: 1.0 },
+      { id: 'HEX_P_54', tier: 'prismatic', name: '终极复盘', icon: 'fa-chart-pie', desc: '日记 AI 分析直接解锁 1 个棱彩大奖！', lore: '深刻的自我剖析价值连城。', effectType: 'review_prismatic', value: 1.0 },
+      { id: 'HEX_P_55', tier: 'prismatic', name: '海克斯创世者', icon: 'fa-microchip', desc: '允许自定义 1 项专属海克斯强化写进数据库！', lore: '你就是这个世界的规则制定者。', effectType: 'creator_mode', value: 1.0 }
+    ];
+
+    /* ==========================================================================
+       2. GLOBAL STATE & API KEY STORAGE
+       ========================================================================== */
+
+    const STATE_KEY = 'life_hextech_state_v3.5';
+    const API_KEY_STORAGE = 'life_hextech_gemini_api_key';
+
+    let state = {
+      dateStr: getTodayDateStr(),
+      dayOfWeek: new Date().getDay(),
+      level: 1,
+      exp: 0,
+      score: 120,
+      dailyTiers: [],
+      currentRound: 1,
+      roundsCompletedToday: 0,
+      seenHextechIdsToday: [],
+      currentRoundSlotRefreshed: [false, false, false],
+      activeBuffs: [],
+      categoryConfig: {},
+      tasks: [],
+      journals: {}
+    };
+
+    let dbFilterTier = 'all';
+    let currentJournalDate = getTodayDateStr();
+    let journalSaveTimer = null;
+    let rerollingTaskId = null;
+
+    function getUserGeminiApiKey() {
+      return (localStorage.getItem(API_KEY_STORAGE) || '').trim();
+    }
+
+    function updateApiStatusUI() {
+      const key = getUserGeminiApiKey();
+      const dot = document.getElementById('api-dot');
+      const label = document.getElementById('api-status-label');
+      const badge = document.getElementById('settings-api-badge');
+      const input = document.getElementById('gemini-api-key-input');
+
+      if (input && key && !input.value) {
+        input.value = key;
+      }
+
+      if (key) {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+        if (label) label.textContent = 'AI已连接';
+        if (badge) {
+          badge.textContent = '已配置 Key (' + key.slice(0, 6) + '...)';
+          badge.className = 'px-2.5 py-1 rounded-lg bg-emerald-950 border border-emerald-500/40 text-[11px] font-mono text-emerald-300 shrink-0';
+        }
+      } else {
+        if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        if (label) label.textContent = '本地模式';
+        if (badge) {
+          badge.textContent = '未配置 Key (本地引擎)';
+          badge.className = 'px-2.5 py-1 rounded-lg bg-stone-900 border border-stone-700 text-[11px] font-mono text-stone-400 shrink-0';
+        }
+      }
+    }
+
+    function toggleApiKeyVisibility() {
+      const input = document.getElementById('gemini-api-key-input');
+      const icon = document.getElementById('api-eye-icon');
+      if (!input) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        input.type = 'password';
+        if (icon) icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function saveGeminiApiKey() {
+      const input = document.getElementById('gemini-api-key-input');
+      const val = (input ? input.value : '').trim();
+      if (!val) {
+        localStorage.removeItem(API_KEY_STORAGE);
+        updateApiStatusUI();
+        showToast('已清除 API Key，切换回离线本地引擎模式');
+        return;
+      }
+      localStorage.setItem(API_KEY_STORAGE, val);
+      updateApiStatusUI();
+      showToast('✅ Gemini API Key 已安全保存在手机本地！');
+    }
+
+    async function testGeminiApiConnection() {
+      const input = document.getElementById('gemini-api-key-input');
+      const key = (input ? input.value : '').trim() || getUserGeminiApiKey();
+      if (!key) {
+        showToast('⚠️ 请先粘贴你的 Gemini API Key！');
+        return;
+      }
+      localStorage.setItem(API_KEY_STORAGE, key);
+      updateApiStatusUI();
+
+      const btn = document.getElementById('btn-test-api');
+      const orig = btn ? btn.textContent : '测试连通性';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '测试中...';
+      }
+
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(key)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: '回复“海克斯核心连接成功”这8个字即可。' }] }]
+          })
+        });
+        const data = await res.json();
+        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          showToast('🎉 Gemini API 连通测试成功！手机 AI 引擎已就绪！');
+        } else {
+          const errMsg = data?.error?.message || '请检查 Key 是否有效或网络是否可访问 Google API';
+          showToast('❌ 连接失败：' + errMsg.slice(0, 45));
+        }
+      } catch (e) {
+        showToast('❌ 网络请求失败，请检查网络连接后重试');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = orig;
+        }
+      }
+    }
+
+    function exportBackupJson() {
+      const payload = {
+        app: 'LifeHextech',
+        exportedAt: new Date().toISOString(),
+        state
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `life_hextech_backup_${getTodayDateStr()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('📤 存档备份文件已导出！');
+    }
+
+    function importBackupJson(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && parsed.state) {
+            state = { ...state, ...parsed.state };
+            saveState();
+            updateHeaderAndHubUI();
+            renderTasks();
+            syncAutoJournal();
+            showToast('📥 存档恢复成功！');
+          } else {
+            showToast('⚠️ 存档文件格式不正确');
+          }
+        } catch (err) {
+          showToast('⚠️ 无法解析该备份文件');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    const RANDOM_TASK_POOL = {
+      study: [
+        '深入理解大模型 Embedding 向量空间映射与余弦相似度计算过程',
+        '探索荣格分析心理学中的「集体无意识」与「阴影原型」概念',
+        '拆解博弈论中的「纳什均衡」与现实社交决策案例',
+        '研读 Transformer 注意力机制（Self-Attention）的矩阵运算直觉',
+        '学习认知心理学中的「心流（Flow）」触发条件与注意力分配机制'
+      ],
+      work: [
+        '清理核心待办清单并推进最高优先级模块交付',
+        '撰写一份结构清晰的系统架构或业务复盘文档',
+        '连续专注 2 个番茄钟攻克当前最棘手的技术/业务阻塞点'
+      ],
+      sport: [
+        '户外快走或慢跑 30 分钟感受多巴胺分泌与心肺激活',
+        '完成 20 分钟核心肌群（平板支撑+死虫式）与全身动态拉伸',
+        '尝试一套 15 分钟 HIIT 高强度间歇燃脂训练'
+      ],
+      diet: [
+        '全天分次饮水满 2000ml，观察身体代谢与专注力变化',
+        '搭配一顿包含优质蛋白、复合碳水与膳食纤维的彩虹健康餐',
+        '挑战今日零精制糖摄入，用天然坚果或蓝莓替代加工零食'
+      ],
+      social: [
+        '主动联系一位久未谋面的朋友，分享近期最有趣的一个发现',
+        '在专业或兴趣社群中输出一条有深度的干货评论',
+        '与家人或伙伴进行 15 分钟不看手机的深度倾听交流'
+      ],
+      skill: [
+        '使用 Python 编写一个自动化处理日常重复文件的小脚本',
+        '练习 25 分钟乐器节奏律动或速写光影构图',
+        '拆解并复刻一个高赞交互界面或剪辑转场特效'
+      ],
+      life: [
+        '进行 15 分钟书桌极简断舍离，清理物理与电子桌面杂物',
+        '复盘本周收支流向并优化下周能量与时间分配表',
+        '晚间脱离电子屏幕 1 小时，阅读纸质书或静坐放空'
+      ],
+      sleep: [
+        '23:00 前开启睡眠准备仪式，保证 7.5 小时高质量深度睡眠',
+        '睡前温水泡脚 15 分钟并配合 4-7-8 呼吸法放松神经',
+        '睡前 40 分钟开启手机勿扰模式，彻底隔绝蓝光刺激'
+      ]
+    };
+
+    const TOPIC_CURATED_LIBRARY = {
+      ai: [
+        '手推并理解词嵌入（Embedding）从 One-Hot 到稠密向量空间的演化过程',
+        '动手测试 Prompt Engineering 中的思维链（CoT）与少样本提示效果',
+        '拆解 RAG（检索增强生成）系统中向量数据库分块与召回的关键细节',
+        '探究扩散模型（Diffusion Model）从高斯噪声逐步去噪生成图像的原理'
+      ],
+      心理学: [
+        '深入剖析荣格心理学中的人格面具、阴影与自性（Self）原型整合',
+        '学习丹尼尔·卡尼曼《思考，快与慢》中的系统1与系统2认知偏差',
+        '探索依恋理论（安全型/焦虑型/回避型）在亲密与职场关系中的投射',
+        '研究斯金纳箱与变比率强化机制如何影响人类习惯养成与游戏成瘾'
+      ],
+      编程: [
+        '理解异步事件循环（Event Loop）与微任务队列的执行优先级',
+        '学习并实践一种经典设计模式（如策略模式或观察者模式）重构代码',
+        '探索现代浏览器的渲染管线：从 DOM 树构建到合成层 GPU 加速'
+      ]
+    };
+
+    const REWARD_POOL = [
+      { name: '一包香脆小鱼干', icon: '🐟', rarity: '普通战利品' },
+      { name: '一瓶冰镇快乐水（可乐）', icon: '🥤', rarity: '普通战利品' },
+      { name: '1 小时畅玩游戏自由券', icon: '🎮', rarity: '稀有战利品' },
+      { name: '45 分钟追剧 / B站 / 番剧时光', icon: '📺', rarity: '稀有战利品' },
+      { name: '一颗海盐黑巧或坚果能量棒', icon: '🍫', rarity: '普通战利品' },
+      { name: '一杯手冲精品咖啡或鲜果茶', icon: '☕', rarity: '稀有战利品' },
+      { name: '2 小时周末无忧大作游戏卡', icon: '🕹️', rarity: '史诗战利品' },
+      { name: '一顿丰盛放纵大餐特权券', icon: '🍔', rarity: '传说战利品' }
+    ];
+
+    function getTodayDateStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STATE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.warn('Failed to save state:', e);
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STATE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = { ...state, ...parsed };
+        }
+      } catch (e) {
+        console.warn('Failed to load state:', e);
+      }
+      const today = getTodayDateStr();
+      if (state.dateStr !== today || !Array.isArray(state.dailyTiers) || state.dailyTiers.length !== 3) {
+        initNewDay(today);
+      }
+      if (!Array.isArray(state.tasks) || state.tasks.length === 0) {
+        generateDefaultTasks();
+      }
+      if (!state.journals[today]) {
+        state.journals[today] = { autoText: '', manualText: '', mood: '🔥 状态绝佳', weather: '☀️ 晴朗温暖' };
+      }
+      currentJournalDate = today;
+    }
+
+    function generateDailyTierSequence() {
+      const tiers = ['silver', 'gold', 'prismatic'];
+      const weights = [0.45, 0.38, 0.17];
+      const seq = [];
+      for (let i = 0; i < 3; i++) {
+        const r = Math.random();
+        if (r < weights[0]) seq.push(tiers[0]);
+        else if (r < weights[0] + weights[1]) seq.push(tiers[1]);
+        else seq.push(tiers[2]);
+      }
+      return seq;
+    }
+
+    function initNewDay(todayStr) {
+      state.dateStr = todayStr;
+      state.dayOfWeek = new Date().getDay();
+      state.dailyTiers = generateDailyTierSequence();
+      state.currentRound = 1;
+      state.roundsCompletedToday = 0;
+      state.seenHextechIdsToday = [];
+      state.currentRoundSlotRefreshed = [false, false, false];
+      state.activeBuffs = [];
+      state.currentOffer = [];
+      generateDefaultTasks();
+      state.journals[todayStr] = { autoText: '', manualText: '', mood: '🔥 状态绝佳', weather: '☀️ 晴朗温暖' };
+      saveState();
+    }
+
+    function showToast(msg) {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      el.className = 'px-4 py-2.5 rounded-xl bg-stone-900/95 border border-amber-500/40 text-xs font-bold text-amber-200 shadow-xl backdrop-blur-md transition-all duration-300 max-w-sm text-center sm:text-left';
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(8px)';
+        setTimeout(() => el.remove(), 300);
+      }, 3000);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'text-amber-300', 'bg-stone-800', 'shadow');
+        btn.classList.add('text-stone-400');
+      });
+      document.querySelectorAll('.mtab-btn').forEach(btn => {
+        btn.classList.remove('text-amber-300');
+        btn.classList.add('text-stone-400');
+      });
+
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove('hidden');
+
+      const navBtn = document.getElementById(`nav-${tabId}`);
+      if (navBtn) {
+        navBtn.classList.add('active', 'text-amber-300', 'bg-stone-800', 'shadow');
+        navBtn.classList.remove('text-stone-400');
+      }
+
+      const mnavBtn = document.getElementById(`mnav-${tabId}`);
+      if (mnavBtn) {
+        mnavBtn.classList.add('text-amber-300');
+        mnavBtn.classList.remove('text-stone-400');
+      }
+
+      if (tabId === 'db') renderDbBrowser();
+      if (tabId === 'journal') renderJournalView();
+      if (tabId === 'settings') updateApiStatusUI();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ==========================================================================
+       3. HEXTECH SELECTION ENGINE
+       ========================================================================== */
+
+    function getTierMeta(tier) {
+      if (tier === 'silver') return { label: '🥈 银阶', badgeClass: 'text-stone-200 bg-stone-800 border-stone-500', cardClass: 'card-tier-silver' };
+      if (tier === 'gold') return { label: '🥇 金阶', badgeClass: 'text-amber-300 bg-amber-950/80 border-amber-500', cardClass: 'card-tier-gold' };
+      return { label: '💎 彩金', badgeClass: 'text-rose-300 bg-rose-950/80 border-rose-400', cardClass: 'card-tier-prismatic' };
+    }
+
+    function drawUniqueCardForTier(tier) {
+      const seenSet = new Set(state.seenHextechIdsToday || []);
+      let candidates = HEXTECH_DATABASE.filter(c => c.tier === tier && !seenSet.has(c.id));
+      if (candidates.length === 0) {
+        candidates = HEXTECH_DATABASE.filter(c => !seenSet.has(c.id));
+      }
+      if (candidates.length === 0) {
+        candidates = HEXTECH_DATABASE.filter(c => c.tier === tier);
+      }
+      const picked = candidates[Math.floor(Math.random() * candidates.length)];
+      if (picked && !seenSet.has(picked.id)) {
+        state.seenHextechIdsToday.push(picked.id);
+      }
+      return picked;
+    }
+
+    function startOrOpenHextechDraft() {
+      if (state.roundsCompletedToday >= 3) {
+        showToast('今日 3 轮海克斯强化已全部选择完毕！');
+        return;
+      }
+      const roundIdx = state.roundsCompletedToday;
+      const tier = state.dailyTiers[roundIdx] || 'silver';
+      if (!Array.isArray(state.currentOffer) || state.currentOffer.length !== 3) {
+        state.currentOffer = [
+          drawUniqueCardForTier(tier),
+          drawUniqueCardForTier(tier),
+          drawUniqueCardForTier(tier)
+        ];
+        state.currentRoundSlotRefreshed = [false, false, false];
+        saveState();
+      }
+      renderHextechModal();
+      document.getElementById('hextech-select-modal').classList.remove('hidden');
+    }
+
+    function rerollHextechSlot(slotIdx) {
+      if (state.currentRoundSlotRefreshed[slotIdx]) {
+        showToast('该卡槽本轮已消耗过 1 次刷新机会！');
+        return;
+      }
+      const roundIdx = state.roundsCompletedToday;
+      const tier = state.dailyTiers[roundIdx] || 'silver';
+      const newCard = drawUniqueCardForTier(tier);
+      state.currentOffer[slotIdx] = newCard;
+      state.currentRoundSlotRefreshed[slotIdx] = true;
+      saveState();
+      updateHeaderAndHubUI();
+      renderHextechModal();
+      showToast(`🔄 已刷新卡槽 ${slotIdx + 1}，获得同阶新强化【${newCard.name}】！`);
+    }
+
+    function selectHextechCard(slotIdx) {
+      const chosen = state.currentOffer[slotIdx];
+      if (!chosen) return;
+      state.activeBuffs.push(chosen);
+      state.roundsCompletedToday += 1;
+      state.currentRound = Math.min(3, state.roundsCompletedToday + 1);
+      state.currentOffer = [];
+      state.currentRoundSlotRefreshed = [false, false, false];
+      applyImmediateHextechEffect(chosen);
+      saveState();
+      document.getElementById('hextech-select-modal').classList.add('hidden');
+      updateHeaderAndHubUI();
+      renderTasks();
+      syncAutoJournal();
+      showToast(`⚡ 已激活海克斯强化：【${chosen.name}】！`);
+    }
+
+    function applyImmediateHextechEffect(card) {
+      if (card.effectType === 'instant_exp') {
+        gainExp(card.value);
+      } else if (card.effectType === 'pts_burst') {
+        state.score += card.value;
+      } else if (card.effectType === 'core_plus2') {
+        state.level += 2;
+      } else if (card.effectType === 'sub_sport') {
+        state.tasks.forEach(t => {
+          if (t.category === 'sport') {
+            t.title = `【户外大冒险改写】前往户外阳光下漫步探索或趣味游玩 35 分钟（奖励 +20%）`;
+          }
+        });
+      }
+    }
+
+    function gainExp(amount) {
+      state.exp += Math.round(amount);
+      while (state.exp >= state.level * 300) {
+        state.exp -= state.level * 300;
+        state.level += 1;
+        showToast(`🎉 恭喜升级！当前海克斯等级：Lv.${state.level}`);
+      }
+    }
+
+    function renderHextechModal() {
+      const roundNum = state.roundsCompletedToday + 1;
+      const tier = state.dailyTiers[state.roundsCompletedToday] || 'silver';
+      const meta = getTierMeta(tier);
+      const badge = document.getElementById('modal-round-badge');
+      if (badge) {
+        badge.textContent = `阶段 ${roundNum}/3 · ${meta.label}`;
+      }
+      const grid = document.getElementById('hextech-cards-offer-grid');
+      if (!grid) return;
+
+      grid.innerHTML = state.currentOffer.map((card, idx) => {
+        const used = state.currentRoundSlotRefreshed[idx];
+        return `
+          <div class="${meta.cardClass} rounded-2xl p-4 sm:p-5 flex flex-col justify-between text-left transition-transform duration-200">
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${meta.badgeClass}">${meta.label}</span>
+                <span class="text-[10px] font-mono text-stone-400">${card.id}</span>
+              </div>
+              <div class="flex items-center gap-3 md:flex-col md:text-center">
+                <div class="w-11 h-11 rounded-xl bg-stone-900/90 border border-amber-500/30 flex items-center justify-center shrink-0">
+                  <i class="fa-solid ${card.icon} text-xl text-amber-300"></i>
+                </div>
+                <h3 class="text-base sm:text-lg font-black text-amber-100">${card.name}</h3>
+              </div>
+              <p class="text-xs text-stone-200 leading-relaxed bg-stone-950/60 p-3 rounded-xl border border-stone-800/80">${card.desc}</p>
+              <p class="text-[11px] italic text-stone-400 text-center">“${card.lore}”</p>
+            </div>
+            <div class="pt-3 mt-3 border-t border-stone-800/80 flex items-center gap-2">
+              <button onclick="rerollHextechSlot(${idx})" ${used ? 'disabled' : ''} class="px-3 py-2 rounded-xl text-xs font-bold border transition flex items-center justify-center gap-1 ${used ? 'bg-stone-900 border-stone-800 text-stone-600 cursor-not-allowed' : 'bg-stone-800 hover:bg-stone-700 border-stone-600 text-amber-200'}">
+                <i class="fa-solid fa-rotate"></i>
+                <span>${used ? '已刷新(1/1)' : '刷新(0/1)'}</span>
+              </button>
+              <button onclick="selectHextechCard(${idx})" class="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-stone-950 font-black text-xs shadow-lg transition">
+                选择此强化
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateHeaderAndHubUI() {
+      const days = ['星期日 (周结算日)', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+      const dayBadge = document.getElementById('current-day-badge');
+      const levelText = document.getElementById('hextech-level-text');
+      const seenCounter = document.getElementById('seen-cards-counter');
+      const scoreVal = document.getElementById('hub-score-val');
+
+      if (dayBadge) dayBadge.textContent = `${state.dateStr} · ${days[state.dayOfWeek] || '冒险日'}`;
+      if (levelText) levelText.textContent = `Lv.${state.level} · ${Math.min(3, state.roundsCompletedToday + 1)}-1`;
+      if (seenCounter) seenCounter.textContent = (state.seenHextechIdsToday || []).length;
+      if (scoreVal) scoreVal.textContent = state.score;
+
+      const seqContainer = document.getElementById('daily-tier-sequence-container');
+      if (seqContainer) {
+        seqContainer.innerHTML = (state.dailyTiers || []).map((t, i) => {
+          const meta = getTierMeta(t);
+          const done = i < state.roundsCompletedToday;
+          return `<span class="px-2 py-1 rounded-lg text-[10px] font-bold border ${meta.badgeClass} ${done ? 'opacity-50 line-through' : ''}">R${i + 1}:${meta.label}</span>`;
+        }).join('');
+      }
+
+      const stageCard = document.getElementById('hextech-stage-card');
+      if (stageCard) {
+        if (state.roundsCompletedToday < 3) {
+          const nextRound = state.roundsCompletedToday + 1;
+          const nextTier = state.dailyTiers[state.roundsCompletedToday] || 'silver';
+          const meta = getTierMeta(nextTier);
+          stageCard.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-300">🔮 海克斯强化传送门</span>
+              <span class="text-[11px] font-mono px-2 py-0.5 rounded border ${meta.badgeClass}">第 ${nextRound}/3 轮 · ${meta.label}</span>
+            </div>
+            <p class="text-xs text-stone-300 leading-relaxed">当前有待开启的海克斯强化选择！每轮 3 张同阶卡牌，各自独立拥有 1 次刷新机会。</p>
+            <button onclick="startOrOpenHextechDraft()" class="hextech-button w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 text-stone-950 font-black text-sm shadow-gold-glow flex items-center justify-center gap-2">
+              <i class="fa-solid fa-wand-sparkles"></i>
+              <span>开启第 ${nextRound} 轮海克斯选择</span>
+            </button>
+          `;
+        } else {
+          stageCard.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-400">✅ 今日海克斯构筑完成</span>
+              <span class="text-[11px] font-mono text-stone-400">3 / 3 已激活</span>
+            </div>
+            <p class="text-xs text-stone-400">你已完成今日全部三次海克斯强化选择，全力推进今日八大维度任务吧！</p>
+          `;
+        }
+      }
+
+      const buffCount = document.getElementById('active-buff-count');
+      const buffContainer = document.getElementById('active-buffs-container');
+      if (buffCount) buffCount.textContent = `${state.activeBuffs.length} / 3`;
+      if (buffContainer) {
+        if (state.activeBuffs.length === 0) {
+          buffContainer.innerHTML = `<div class="text-xs text-stone-500 text-center py-5 border border-dashed border-stone-800 rounded-xl">尚未激活海克斯强化，请先开启上方传送门</div>`;
+        } else {
+          buffContainer.innerHTML = state.activeBuffs.map(b => {
+            const meta = getTierMeta(b.tier);
+            return `
+              <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800 flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-stone-950 border border-amber-500/25 flex items-center justify-center shrink-0 mt-0.5">
+                  <i class="fa-solid ${b.icon} text-amber-400"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between gap-2">
+                    <span class="text-xs font-bold text-stone-100 truncate">${b.name}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded border ${meta.badgeClass} shrink-0">${meta.label}</span>
+                  </div>
+                  <p class="text-[11px] text-stone-400 mt-1 leading-snug">${b.desc}</p>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+    }
+
+    function renderDbBrowser() {
+      const grid = document.getElementById('db-cards-grid');
+      if (!grid) return;
+      const list = dbFilterTier === 'all' ? HEXTECH_DATABASE : HEXTECH_DATABASE.filter(c => c.tier === dbFilterTier);
+      grid.innerHTML = list.map(card => {
+        const meta = getTierMeta(card.tier);
+        return `
+          <div class="${meta.cardClass} rounded-xl p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded border ${meta.badgeClass}">${meta.label}</span>
+              <span class="text-[10px] font-mono text-stone-400">${card.id}</span>
+            </div>
+            <div class="flex items-center gap-2.5 pt-1">
+              <i class="fa-solid ${card.icon} text-amber-300 text-base"></i>
+              <h4 class="text-sm font-bold text-amber-100">${card.name}</h4>
+            </div>
+            <p class="text-xs text-stone-300 leading-relaxed">${card.desc}</p>
+            <p class="text-[10px] italic text-stone-400">“${card.lore}”</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterDbCards(tier) {
+      dbFilterTier = tier;
+      document.querySelectorAll('.db-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-amber-500', 'text-stone-950');
+        btn.classList.add('bg-stone-800', 'text-stone-300');
+      });
+      if (event && event.target) {
+        event.target.classList.add('active', 'bg-amber-500', 'text-stone-950');
+        event.target.classList.remove('bg-stone-800', 'text-stone-300');
+      }
+      renderDbBrowser();
+    }
+
+    /* ==========================================================================
+       4. DAILY TASKS ENGINE, AI GENERATION & PER-TASK REROLL WITH REASON
+       ========================================================================== */
+
+    function buildTaskForCategory(catId, mode, customText, priority = 'random', excludeTitle = '') {
+      const cat = getCategoryMeta(catId);
+      const cleanCustom = (customText || '').trim();
+      let title = '';
+
+      if (mode === 'custom' && cleanCustom) {
+        const lowerKey = cleanCustom.toLowerCase();
+        if (TOPIC_CURATED_LIBRARY[lowerKey]) {
+          const pool = TOPIC_CURATED_LIBRARY[lowerKey].filter(item => item !== excludeTitle);
+          const pickFrom = pool.length > 0 ? pool : TOPIC_CURATED_LIBRARY[lowerKey];
+          title = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+        } else if (catId === 'study') {
+          const templates = [
+            `深度探究「${cleanCustom}」的核心概念、底层机制与一个实战小案例`,
+            `梳理「${cleanCustom}」的知识图谱并输出 150 字费曼学习法总结`,
+            `拆解「${cleanCustom}」领域中的一个经典原理或前沿应用案例`
+          ];
+          const valid = templates.filter(t => t !== excludeTitle);
+          title = valid[Math.floor(Math.random() * valid.length)];
+        } else if (catId === 'sport') {
+          title = `完成一组围绕「${cleanCustom}」的 30 分钟专项训练与核心激活`;
+        } else if (catId === 'skill') {
+          title = `动手实践「${cleanCustom}」专项技能 35 分钟并输出一个微作品`;
+        } else {
+          title = `围绕「${cleanCustom}」执行今日专属${cat.name}推进计划`;
+        }
+      } else {
+        const rawPool = RANDOM_TASK_POOL[catId] || [`完成今日${cat.name}核心目标`];
+        const filtered = rawPool.filter(item => item !== excludeTitle);
+        const pickFrom = filtered.length > 0 ? filtered : rawPool;
+        title = pickFrom[Math.floor(Math.random() * pickFrom.length)];
+      }
+
+      return {
+        id: 'TASK_' + catId + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        category: catId,
+        title,
+        priority,
+        completed: false,
+        basePoints: 50,
+        rerollHistory: [],
+        createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+    }
+
+    function openRerollTaskModal(taskId, e) {
+      if (e) e.stopPropagation();
+      const task = state.tasks.find(t => t.id === taskId);
+      if (!task) return;
+      rerollingTaskId = taskId;
+      const cat = getCategoryMeta(task.category);
+      document.getElementById('reroll-target-cat').innerHTML = `<i class="fa-solid ${cat.icon} mr-1"></i>${cat.name}任务 · 当前内容：`;
+      document.getElementById('reroll-target-title').textContent = task.title;
+      document.getElementById('reroll-reason-input').value = '';
+      document.getElementById('reroll-task-modal').classList.remove('hidden');
+    }
+
+    function closeRerollTaskModal() {
+      rerollingTaskId = null;
+      document.getElementById('reroll-task-modal').classList.add('hidden');
+    }
+
+    function setQuickRerollReason(reasonText) {
+      const input = document.getElementById('reroll-reason-input');
+      if (input) input.value = reasonText;
+    }
+
+    async function confirmRerollSingleTask() {
+      const reasonInput = document.getElementById('reroll-reason-input');
+      const reason = (reasonInput ? reasonInput.value : '').trim();
+      if (reason.length < 2) {
+        showToast('⚠️ 请先填写重新随机的理由（至少 2 个字）！');
+        if (reasonInput) reasonInput.focus();
+        return;
+      }
+
+      const taskIdx = state.tasks.findIndex(t => t.id === rerollingTaskId);
+      if (taskIdx === -1) {
+        closeRerollTaskModal();
+        return;
+      }
+
+      const oldTask = state.tasks[taskIdx];
+      const cat = getCategoryMeta(oldTask.category);
+      const cfg = state.categoryConfig[oldTask.category] || { mode: 'random', customText: '' };
+
+      const btn = document.getElementById('btn-confirm-reroll-task');
+      const origHtml = btn ? btn.innerHTML : '确认理由并重随';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> 生成新任务中...`;
+      }
+
+      let aiNewTitle = null;
+      const apiKey = getUserGeminiApiKey();
+
+      if (apiKey) {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+        try {
+          const directionInfo = cfg.mode === 'custom' && cfg.customText.trim()
+            ? `用户指定方向：${cfg.customText.trim()}`
+            : '全随机方向（自由发挥创意）';
+          const res = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `玩家请求重新随机一项【${cat.name}】任务。\n` +
+                        `原任务：${oldTask.title}\n` +
+                        `重随理由：${reason}\n` +
+                        `${directionInfo}\n` +
+                        `请结合用户的重随理由与类别方向，生成 1 条全新的、具体有趣的替代任务（学习/技能类需指定具体知识点或实操动作，避免与原任务重复）。仅返回 JSON：{"title": "..."}`
+                }]
+              }],
+              generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                  type: "OBJECT",
+                  properties: {
+                    title: { type: "STRING" }
+                  },
+                  required: ["title"]
+                }
+              }
+            })
+          });
+          const data = await res.json();
+          const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.title && parsed.title.trim() !== oldTask.title) {
+              aiNewTitle = parsed.title.trim();
+            }
+          }
+        } catch (err) {
+          console.warn('Single task reroll fallback to local pool:', err);
+        }
+      }
+
+      const fallbackTask = buildTaskForCategory(oldTask.category, cfg.mode, cfg.customText, oldTask.priority, oldTask.title);
+      const newTitle = aiNewTitle || fallbackTask.title;
+      const historyList = Array.isArray(oldTask.rerollHistory) ? [...oldTask.rerollHistory] : [];
+      historyList.push({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        oldTitle: oldTask.title,
+        newTitle,
+        reason
+      });
+
+      state.tasks[taskIdx] = {
+        ...oldTask,
+        title: newTitle,
+        completed: false,
+        rerollHistory: historyList,
+        lastRerollReason: reason
+      };
+
+      saveState();
+      renderTasks();
+      syncAutoJournal();
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+      }
+      closeRerollTaskModal();
+      showToast(`🎲 已记录理由并重新生成【${cat.name}】任务！`);
+    }
+
+    function generateDefaultTasks() {
+      state.tasks = CATEGORIES.map(cat => {
+        const cfg = state.categoryConfig[cat.id] || { mode: 'random', customText: '' };
+        return buildTaskForCategory(cat.id, cfg.mode, cfg.customText, 'random');
+      });
+    }
+
+    function getPriorityMeta(priority) {
+      if (priority === 'urgent') return { weight: 4, label: '🚨 紧急导入', cls: 'bg-rose-950 text-rose-300 border-rose-700' };
+      if (priority === 'today') return { weight: 3, label: '📌 当天导入', cls: 'bg-amber-950 text-amber-300 border-amber-700' };
+      if (priority === 'sunday') return { weight: 2, label: '📅 周日预排', cls: 'bg-orange-950 text-orange-300 border-orange-700' };
+      return { weight: 1, label: '🎲 随机生成', cls: 'bg-stone-800 text-amber-200 border-amber-600/40' };
+    }
+
+    function getCategoryMeta(catId) {
+      return CATEGORIES.find(c => c.id === catId) || { id: catId, name: '日常', icon: 'fa-star' };
+    }
+
+    function toggleTaskComplete(taskId) {
+      const task = state.tasks.find(t => t.id === taskId);
+      if (!task) return;
+      task.completed = !task.completed;
+      if (task.completed) {
+        gainExp(task.basePoints || 50);
+        state.score += 20;
+        showToast(`✅ 完成任务「${task.title.slice(0, 14)}...」 +50 EXP`);
+      }
+      saveState();
+      renderTasks();
+      updateHeaderAndHubUI();
+      syncAutoJournal();
+    }
+
+    function deleteTask(taskId) {
+      state.tasks = state.tasks.filter(t => t.id !== taskId);
+      saveState();
+      renderTasks();
+      syncAutoJournal();
+    }
+
+    function renderTasks() {
+      const sorted = [...state.tasks].sort((a, b) => getPriorityMeta(b.priority).weight - getPriorityMeta(a.priority).weight);
+      const total = sorted.length;
+      const doneCount = sorted.filter(t => t.completed).length;
+      const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+      const progressText = document.getElementById('hub-progress-text');
+      const progressBar = document.getElementById('hub-progress-bar');
+      if (progressText) progressText.textContent = `${pct}% (${doneCount}/${total})`;
+      if (progressBar) progressBar.style.width = `${pct}%`;
+
+      const hubPreview = document.getElementById('hub-tasks-preview');
+      if (hubPreview) {
+        hubPreview.innerHTML = sorted.map(t => {
+          const cat = getCategoryMeta(t.category);
+          const pri = getPriorityMeta(t.priority);
+          return `
+            <div onclick="toggleTaskComplete('${t.id}')" class="p-3 rounded-xl border transition cursor-pointer flex items-center justify-between gap-2.5 ${t.completed ? 'bg-stone-900/40 border-emerald-500/30 opacity-70' : 'bg-stone-900/90 border-stone-800 hover:border-amber-500/40'}">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${t.completed ? 'bg-emerald-500 border-emerald-400 text-stone-950' : 'border-stone-600'}">
+                  ${t.completed ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="text-[10px] font-bold text-amber-300"><i class="fa-solid ${cat.icon} mr-1"></i>${cat.name}</span>
+                    <span class="text-[9px] px-1.5 py-0.2 rounded border ${pri.cls}">${pri.label}</span>
+                    ${t.lastRerollReason ? `<span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-950/90 text-orange-300 border border-orange-700/60">已重随</span>` : ''}
+                  </div>
+                  <div class="text-xs font-medium truncate ${t.completed ? 'line-through text-stone-500' : 'text-stone-100'}">${t.title}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button type="button" onclick="openRerollTaskModal('${t.id}', event)" class="px-2 py-1 rounded-lg bg-stone-800 hover:bg-amber-900/60 border border-stone-700 hover:border-amber-500/50 text-[10px] font-bold text-amber-200 transition" title="填写理由重新随机此任务">
+                  <i class="fa-solid fa-dice"></i>
+                </button>
+                <span class="text-[10px] font-mono text-amber-300 hidden sm:inline">+${t.basePoints}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const fullList = document.getElementById('tasks-full-list');
+      if (fullList) {
+        fullList.innerHTML = sorted.map(t => {
+          const cat = getCategoryMeta(t.category);
+          const pri = getPriorityMeta(t.priority);
+          return `
+            <div class="glass-panel p-4 rounded-2xl border transition flex flex-col justify-between gap-3 ${t.completed ? 'border-emerald-500/30 bg-stone-900/40' : 'border-stone-800 hover:border-amber-500/35'}">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-lg bg-stone-900 border border-stone-700 flex items-center justify-center text-amber-300 text-xs">
+                    <i class="fa-solid ${cat.icon}"></i>
+                  </span>
+                  <div>
+                    <div class="text-xs font-bold text-stone-100">${cat.name}任务</div>
+                    <div class="text-[10px] text-stone-400 font-mono">创建于 ${t.createdAt || '今日'}</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] px-2 py-0.5 rounded border ${pri.cls}">${pri.label}</span>
+                  <button type="button" onclick="openRerollTaskModal('${t.id}', event)" class="px-2 py-0.5 rounded bg-amber-950/80 hover:bg-amber-900 border border-amber-600/50 text-amber-200 text-[10px] font-bold transition flex items-center gap-1" title="填写理由重新随机">
+                    <i class="fa-solid fa-dice"></i><span>换一个</span>
+                  </button>
+                  <button onclick="deleteTask('${t.id}')" class="text-stone-500 hover:text-rose-400 text-xs px-1.5 py-0.5" title="删除任务">
+                    <i class="fa-solid fa-trash-can"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <p class="text-xs leading-relaxed ${t.completed ? 'line-through text-stone-500' : 'text-stone-100'}">${t.title}</p>
+                ${t.lastRerollReason ? `<div class="text-[11px] text-orange-300/90 bg-orange-950/40 border border-orange-800/40 rounded-lg px-2.5 py-1"><i class="fa-solid fa-quote-left mr-1 text-[9px]"></i>重随理由：${t.lastRerollReason}</div>` : ''}
+              </div>
+              <div class="pt-2 border-t border-stone-800/80 flex items-center justify-between">
+                <span class="text-[11px] font-mono text-amber-300">基础奖励: +${t.basePoints} EXP</span>
+                <button onclick="toggleTaskComplete('${t.id}')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${t.completed ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/40' : 'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-stone-950'}">
+                  ${t.completed ? '已完成 ✓' : '标记完成'}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function openImportTaskModal() {
+      document.getElementById('import-task-modal').classList.remove('hidden');
+    }
+
+    function closeImportTaskModal() {
+      document.getElementById('import-task-modal').classList.add('hidden');
+    }
+
+    function submitImportedTask() {
+      const priority = document.getElementById('import-task-priority').value;
+      const category = document.getElementById('import-task-category').value;
+      const titleInput = document.getElementById('import-task-title');
+      const title = titleInput.value.trim();
+      if (!title) {
+        showToast('请输入任务内容描述！');
+        return;
+      }
+      state.tasks.unshift({
+        id: 'TASK_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        category,
+        title,
+        priority,
+        completed: false,
+        basePoints: priority === 'urgent' ? 80 : 60,
+        rerollHistory: [],
+        createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      titleInput.value = '';
+      saveState();
+      renderTasks();
+      syncAutoJournal();
+      closeImportTaskModal();
+      showToast('📌 新任务已按优先级调度写入！');
+    }
+
+    function openPerCategoryModal() {
+      renderCategorySettingsRows();
+      document.getElementById('per-category-modal').classList.remove('hidden');
+    }
+
+    function closePerCategoryModal() {
+      document.getElementById('per-category-modal').classList.add('hidden');
+    }
+
+    function setCategoryMode(catId, mode) {
+      if (!state.categoryConfig[catId]) state.categoryConfig[catId] = { mode: 'random', customText: '' };
+      state.categoryConfig[catId].mode = mode;
+      saveState();
+      renderCategorySettingsRows();
+    }
+
+    function updateCategoryCustomText(catId, val) {
+      if (!state.categoryConfig[catId]) state.categoryConfig[catId] = { mode: 'custom', customText: '' };
+      state.categoryConfig[catId].customText = val;
+      saveState();
+    }
+
+    function applyTagPreset(catId, tag) {
+      if (!state.categoryConfig[catId]) state.categoryConfig[catId] = { mode: 'custom', customText: '' };
+      state.categoryConfig[catId].mode = 'custom';
+      state.categoryConfig[catId].customText = tag;
+      saveState();
+      renderCategorySettingsRows();
+    }
+
+    function setAllCategoriesRandom() {
+      CATEGORIES.forEach(cat => {
+        state.categoryConfig[cat.id] = { mode: 'random', customText: '' };
+      });
+      saveState();
+      renderCategorySettingsRows();
+      showToast('🎲 已将全部 8 个任务类别切换为全随机模式');
+    }
+
+    function renderCategorySettingsRows() {
+      const container = document.getElementById('category-settings-rows');
+      if (!container) return;
+
+      container.innerHTML = CATEGORIES.map(cat => {
+        const cfg = state.categoryConfig[cat.id] || { mode: 'random', customText: '' };
+        const isCustom = cfg.mode === 'custom';
+        return `
+          <div class="p-3 rounded-xl bg-stone-900/90 border border-stone-800 space-y-2">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-stone-950 border border-stone-700 flex items-center justify-center text-amber-300 text-xs">
+                  <i class="fa-solid ${cat.icon}"></i>
+                </span>
+                <span class="text-xs font-bold text-stone-100">${cat.name}任务</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="setCategoryMode('${cat.id}', 'random')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${!isCustom ? 'bg-amber-600 text-stone-950' : 'bg-stone-800 text-stone-400 hover:text-stone-200'}">
+                  🎲 全随机
+                </button>
+                <button type="button" onclick="setCategoryMode('${cat.id}', 'custom')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${isCustom ? 'bg-orange-500 text-stone-950' : 'bg-stone-800 text-stone-400 hover:text-stone-200'}">
+                  ✍️ 自定义方向
+                </button>
+              </div>
+            </div>
+            ${isCustom ? `
+              <div class="space-y-1.5 pt-1">
+                <input type="text" value="${(cfg.customText || '').replace(/"/g, '&quot;')}" oninput="updateCategoryCustomText('${cat.id}', this.value)" placeholder="输入具体方向，例如：AI、荣格心理学、核心力量..." class="w-full bg-stone-950 border border-amber-500/40 rounded-lg px-3 py-1.5 text-xs text-stone-100 outline-none">
+                <div class="flex flex-wrap items-center gap-1">
+                  <span class="text-[10px] text-stone-500">快捷灵感:</span>
+                  ${cat.tags.map(tag => `<button type="button" onclick="applyTagPreset('${cat.id}', '${tag}')" class="text-[10px] px-2 py-0.5 rounded bg-stone-800 hover:bg-stone-700 text-amber-300">${tag}</button>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function generateTasksFromCategories() {
+      const btn = document.getElementById('btn-generate-cat-tasks');
+      const originalHtml = btn ? btn.innerHTML : '立即生成今日任务';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> 正在定制今日具体任务...`;
+      }
+
+      const directionsPayload = CATEGORIES.map(cat => {
+        const cfg = state.categoryConfig[cat.id] || { mode: 'random', customText: '' };
+        return {
+          categoryId: cat.id,
+          categoryName: cat.name,
+          mode: cfg.mode,
+          direction: cfg.mode === 'custom' && cfg.customText.trim() ? cfg.customText.trim() : '全随机（由你发挥创意指定具体有趣的知识点或行动）'
+        };
+      });
+
+      const apiKey = getUserGeminiApiKey();
+      let generatedList = null;
+
+      if (apiKey) {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{
+                  text: `你是一个富有创意的人生海克斯任务规划师。请根据以下 8 个维度的方向要求，为玩家生成今日具体、有趣、可直接执行的任务。\n` +
+                        `特别要求：\n` +
+                        `1. 学习/技能类必须直接指定具体的知识点或实操主题（例如AI方向写“手推并理解词嵌入 Embedding 向量空间映射过程”，心理学方向写“探索荣格心理学中的阴影与阿尼玛原型”），切忌空泛。\n` +
+                        `2. 如果是全随机模式，请发挥想象力给出具体且有意思的任务。\n` +
+                        `3. 严格返回 JSON 数组，每个元素包含 categoryId 和 title 两个字符串字段。\n\n` +
+                        `方向配置：${JSON.stringify(directionsPayload)}`
+                }]
+              }],
+              generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      categoryId: { type: "STRING" },
+                      title: { type: "STRING" }
+                    },
+                    required: ["categoryId", "title"]
+                  }
+                }
+              }
+            })
+          });
+
+          const data = await response.json();
+          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawText) {
+            const parsed = JSON.parse(rawText);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              generatedList = parsed;
+            }
+          }
+        } catch (err) {
+          console.warn('Gemini task generation fallback to local engine:', err);
+        }
+      }
+
+      const preservedTasks = state.tasks.filter(t => t.priority !== 'random');
+
+      const newRandomTasks = CATEGORIES.map(cat => {
+        const cfg = state.categoryConfig[cat.id] || { mode: 'random', customText: '' };
+        const aiMatch = generatedList ? generatedList.find(item => item.categoryId === cat.id) : null;
+        if (aiMatch && aiMatch.title) {
+          return {
+            id: 'TASK_' + cat.id + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+            category: cat.id,
+            title: aiMatch.title,
+            priority: 'random',
+            completed: false,
+            basePoints: 55,
+            rerollHistory: [],
+            createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          };
+        }
+        return buildTaskForCategory(cat.id, cfg.mode, cfg.customText, 'random');
+      });
+
+      state.tasks = [...preservedTasks, ...newRandomTasks];
+
+      if (state.activeBuffs.some(b => b.effectType === 'sub_sport')) {
+        state.tasks.forEach(t => {
+          if (t.category === 'sport') {
+            t.title = `【户外大冒险改写】前往户外阳光下漫步探索或趣味游玩 35 分钟（奖励 +20%）`;
+          }
+        });
+      }
+
+      saveState();
+      renderTasks();
+      syncAutoJournal();
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+      }
+      closePerCategoryModal();
+      showToast(generatedList ? '✨ Gemini AI 已为你定制今日具体任务！' : '🎲 已根据各维度方向生成今日专属任务！');
+    }
+
+    function buildAutoJournalSummaryText() {
+      const done = state.tasks.filter(t => t.completed);
+      const pending = state.tasks.filter(t => !t.completed);
+      const total = state.tasks.length || 1;
+      const pct = Math.round((done.length / total) * 100);
+      const buffsText = state.activeBuffs.length > 0
+        ? state.activeBuffs.map(b => `  • [${getTierMeta(b.tier).label}] ${b.name}：${b.desc}`).join('\n')
+        : '  • 暂无激活的海克斯强化';
+      const doneText = done.length > 0
+        ? done.map(t => `  [✓] (${getCategoryMeta(t.category).name}) ${t.title}`).join('\n')
+        : '  • 暂未完成任何任务';
+      const pendingText = pending.length > 0
+        ? pending.map(t => `  [ ] (${getCategoryMeta(t.category).name}) ${t.title}`).join('\n')
+        : '  • 今日全部任务均已完成！';
+
+      const rerollLogs = [];
+      state.tasks.forEach(t => {
+        if (Array.isArray(t.rerollHistory)) {
+          t.rerollHistory.forEach(h => {
+            rerollLogs.push(`  • [${h.time}] (${getCategoryMeta(t.category).name}) 理由：“${h.reason}” → 换为「${h.newTitle}」`);
+          });
+        }
+      });
+      const rerollSection = rerollLogs.length > 0
+        ? `\n\n🎲 任务重随与调整记录：\n${rerollLogs.join('\n')}`
+        : '';
+
+      return `📅 日期：${state.dateStr} | 等级：Lv.${state.level} | 积分：${state.score} PTS\n` +
+             `📊 任务完成进度：${done.length}/${total} (${pct}%)\n\n` +
+             `⚡ 今日激活海克斯强化：\n${buffsText}\n\n` +
+             `✅ 已完成任务清单：\n${doneText}\n\n` +
+             `⏳ 待推进任务清单：\n${pendingText}${rerollSection}`;
+    }
+
+    function syncAutoJournal() {
+      const today = getTodayDateStr();
+      if (!state.journals[today]) {
+        state.journals[today] = { autoText: '', manualText: '', mood: '🔥 状态绝佳', weather: '☀️ 晴朗温暖' };
+      }
+      state.journals[today].autoText = buildAutoJournalSummaryText();
+      saveState();
+      if (currentJournalDate === today) {
+        renderJournalView();
+      }
+    }
+
+    function renderJournalView() {
+      const entry = state.journals[currentJournalDate] || {
+        autoText: currentJournalDate === getTodayDateStr() ? buildAutoJournalSummaryText() : '该日期暂无自动记录数据',
+        manualText: '',
+        mood: '🔥 状态绝佳',
+        weather: '☀️ 晴朗温暖'
+      };
+      const titleEl = document.getElementById('journal-view-date-title');
+      const autoEl = document.getElementById('auto-journal-content');
+      const manualEl = document.getElementById('manual-journal-textarea');
+      const moodEl = document.getElementById('journal-mood-select');
+      const weatherEl = document.getElementById('journal-weather-select');
+
+      if (titleEl) titleEl.textContent = currentJournalDate === getTodayDateStr() ? `Today (${currentJournalDate})` : currentJournalDate;
+      if (autoEl) autoEl.innerHTML = `<pre class="whitespace-pre-wrap font-mono text-xs text-stone-300 leading-relaxed">${entry.autoText}</pre>`;
+      if (manualEl) manualEl.value = entry.manualText || '';
+      if (moodEl) moodEl.value = entry.mood || '🔥 状态绝佳';
+      if (weatherEl) weatherEl.value = entry.weather || '☀️ 晴朗温暖';
+    }
+
+    function changeJournalDay(offset) {
+      const parts = currentJournalDate.split('-').map(Number);
+      const d = new Date(parts[0], parts[1] - 1, parts[2]);
+      d.setDate(d.getDate() + offset);
+      currentJournalDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      renderJournalView();
+    }
+
+    function debouncedSaveJournal() {
+      const statusEl = document.getElementById('save-journal-status');
+      if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> 保存中...`;
+      clearTimeout(journalSaveTimer);
+      journalSaveTimer = setTimeout(saveManualJournal, 400);
+    }
+
+    function saveManualJournal() {
+      if (!state.journals[currentJournalDate]) {
+        state.journals[currentJournalDate] = { autoText: '', manualText: '', mood: '🔥 状态绝佳', weather: '☀️ 晴朗温暖' };
+      }
+      state.journals[currentJournalDate].manualText = document.getElementById('manual-journal-textarea').value;
+      state.journals[currentJournalDate].mood = document.getElementById('journal-mood-select').value;
+      state.journals[currentJournalDate].weather = document.getElementById('journal-weather-select').value;
+      saveState();
+      const statusEl = document.getElementById('save-journal-status');
+      if (statusEl) statusEl.innerHTML = `<i class="fa-solid fa-check"></i> 已保存`;
+    }
+
+    async function generateAIJournalSummary() {
+      const apiKey = getUserGeminiApiKey();
+      if (!apiKey) {
+        showToast('💡 请先在「API/安装」页面填入你的 Gemini API Key！');
+        switchTab('settings');
+        return;
+      }
+      showToast('✨ 正在召唤 Gemini AI 提炼今日海克斯冒险评语...');
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(apiKey)}`;
+      const summaryContext = buildAutoJournalSummaryText();
+      try {
+        const res = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: `请根据以下今日人生海克斯战报，生成一段 80 字以内温暖又富有洞察力的海克斯史官评语：\n${summaryContext}` }] }]
+          })
+        });
+        const data = await res.json();
+        const quote = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (quote) {
+          state.journals[currentJournalDate].autoText = `${summaryContext}\n\n🔮 【海克斯史官 AI 评语】：\n${quote.trim()}`;
+          saveState();
+          renderJournalView();
+          showToast('✨ AI 史官评语已写入今日日志！');
+        } else {
+          showToast('⚠️ API 返回异常，请检查 Key 配额');
+        }
+      } catch (e) {
+        showToast('⚠️ AI 评语连接超时，已保留本地战报摘要');
+      }
+    }
+
+    function copyFullJournal() {
+      const entry = state.journals[currentJournalDate] || {};
+      const fullText = `=== 人生海克斯冒险日志 (${currentJournalDate}) ===\n心情：${entry.mood || ''} | 环境：${entry.weather || ''}\n\n${entry.autoText || ''}\n\n✍️ 【个人手记】：\n${entry.manualText || '（暂无手记）'}`;
+      const ta = document.createElement('textarea');
+      ta.value = fullText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('📋 完整冒险日志已复制到剪贴板！');
+    }
+
+    function triggerSettlement(type) {
+      const doneCount = state.tasks.filter(t => t.completed).length;
+      const total = state.tasks.length || 1;
+      const rate = Math.round((doneCount / total) * 100);
+      const buffBonus = state.activeBuffs.length * 45;
+      const earnedScore = doneCount * 35 + buffBonus;
+      state.score += earnedScore;
+      gainExp(earnedScore * 2);
+
+      const dropCount = rate >= 80 ? 2 : (rate >= 40 ? 1 : 0);
+      const drops = [];
+      for (let i = 0; i < dropCount; i++) {
+        drops.push(REWARD_POOL[Math.floor(Math.random() * REWARD_POOL.length)]);
+      }
+
+      saveState();
+      updateHeaderAndHubUI();
+
+      const box = document.getElementById('settlement-result-box');
+      if (box) {
+        box.classList.remove('hidden');
+        box.innerHTML = `
+          <div class="flex items-center justify-between border-b border-stone-800 pb-2">
+            <h3 class="text-sm font-black text-amber-300">${type === 'daily' ? '🌙 每日 22:00 小结算报告' : '👑 每周终极大结算报告'}</h3>
+            <span class="text-xs font-mono text-emerald-400">完成率 ${rate}% · +${earnedScore} PTS</span>
+          </div>
+          <p class="text-xs text-stone-300">本次结算共完成 <strong>${doneCount}/${total}</strong> 项任务，激活 <strong>${state.activeBuffs.length}</strong> 项海克斯强化加成。</p>
+          <div class="space-y-1.5">
+            <div class="text-xs font-bold text-amber-200">🎁 现实战利品掉落：</div>
+            ${drops.length > 0
+              ? drops.map(d => `<div class="p-2.5 rounded-xl bg-stone-900 border border-amber-500/30 text-xs text-amber-200 flex items-center justify-between"><span>${d.icon} ${d.name}</span><span class="text-[10px] text-stone-400">${d.rarity}</span></div>`).join('')
+              : `<div class="text-xs text-stone-500">完成率达到 40% 以上即可解锁现实零食/游戏战利品掉落！</div>`}
+          </div>
+        `;
+      }
+      showToast(`🎉 ${type === 'daily' ? '每日小结算' : '每周大结算'}已完成！`);
+    }
+
+    window.onload = function () {
+      loadState();
+      updateApiStatusUI();
+      updateHeaderAndHubUI();
+      renderTasks();
+      syncAutoJournal();
+    };
+  </script>
+</body>
+</html>
+```
+
+```markdown:人生海克斯 (Life Hextech) 安卓 APP 使用与 API 连接说明书:ANDROID_APP_MANUAL.md
+# 人生海克斯 (Life Hextech) — 安卓手机使用与 API 连接说明书
+
+## 一、 如何在安卓手机上安装为独立 APP
+
+本程序已针对安卓手机进行移动端深度适配（自带底部导航栏、全面屏安全区适配、PWA 应用清单与离线本地数据库），你可以通过以下任意一种方式在安卓手机上使用：
+
+### 方式 A：免安装打包，直接添加到安卓桌面（最快捷，推荐）
+1. **将网页部署或传到手机**：
+   - **在线访问（推荐，支持 PWA 原生安装弹窗）**：将 `index.html` 免费托管到任意静态页面服务（如 GitHub Pages、Cloudflare Pages 或 Vercel），用手机浏览器打开该网址。
+   - **本地打开**：也可直接把 `index.html` 发送到手机，用手机上的 **Chrome**、**Edge** 或 **Via 浏览器** 打开。
+2. **生成桌面 APP 图标**：
+   - 在浏览器右上角点击 **`⋮`（更多菜单）**。
+   - 选择 **「添加到主屏幕」** 或 **「安装应用」**（也可点击 APP 内 **「API/安装」** 页面的绿色 **「📲 唤起安卓桌面安装提示」** 按钮）。
+   - 确认后，手机桌面会出现 **「人生海克斯」** 专属图标，点击即可像原生 APP 一样全屏运行（无浏览器地址栏）。
+
+### 方式 B：封装为标准 `.apk` 安装包（适合离线安装或分发）
+如果你想生成纯粹的 `LifeHextech.apk` 文件，可以使用 **Capacitor**（官方开源跨平台框架）一键打包：
+```bash
+# 1. 在电脑新建目录并将 index.html 放入 www/ 文件夹
+mkdir life-hextech-app && cd life-hextech-app
+mkdir www && cp /path/to/index.html www/index.html
+
+# 2. 初始化 Capacitor 并添加 Android 工程
+npm init -y
+npm install @capacitor/core @capacitor/cli @capacitor/android
+npx cap init "人生海克斯" "com.life.hextech" --web-dir www
+npx cap add android
+
+# 3. 同步并打开 Android Studio 编译 APK
+npx cap sync android
+npx cap open android
+# 在 Android Studio 顶部菜单选择 Build -> Build Bundle(s) / APK(s) -> Build APK(s)
+```
+
+---
+
+## 二、 连接 Gemini AI API 的详细操作步骤
+
+不连接 API 时，APP 会自动使用内置的本地精选知识库运行；**连接 Gemini API 后**，每次生成任务或填写理由重随任务时，AI 会实时为你量身定制具体知识点与趣味行动。
+
+### 第一步：获取免费的 Google Gemini API Key
+1. 在手机或电脑浏览器打开 Google AI Studio 官方页面：
+   **`https://aistudio.google.com/apikey`**
+2. 使用你的 Google 账号登录。
+3. 点击页面上的 **「Create API key」**（创建 API 密钥）按钮。
+4. 复制生成的一串以 **`AIzaSy`** 开头的字符（这就是你的专属 API Key）。
+
+### 第二步：在「人生海克斯」APP 中填入并测试 API Key
+1. 打开手机上的 **人生海克斯 APP**。
+2. 点击底部导航栏最右侧的 **「API/安装」** 标签（或点击顶部右上角的 **「API配置」** 状态胶囊）。
+3. 在 **「Gemini AI API 连接配置」** 输入框中，粘贴刚才复制的 `AIzaSy...` 密钥。
+4. 点击 **「保存 Key」** 按钮（密钥仅保存在你手机本地的 `localStorage` 中，不会上传至任何第三方服务器）。
+5. 点击旁边的 **「测试连通性」** 按钮：
+   - 若右上角状态变为绿色呼吸灯 **「AI已连接」**，并弹出 *“Gemini API 连通测试成功”* 提示，即表示配置完成！
+   - *(注：国内网络环境下使用手机调用 Google API 时，请确保手机网络可正常访问 `generativelanguage.googleapis.com`。)*
+
+---
+
+## 三、 每日标准游玩与成长流程
+
+1. **晨间海克斯三连抽（海克斯中枢）**：
+   - 每天系统会随机分配 3 轮海克斯品质序列（例如：`R1: 银阶`、`R2: 金阶`、`R3: 彩金`）。
+   - 每轮出现 3 张同阶卡牌，**每个卡槽有 1 次独立刷新机会**，刷新与后续轮次均严格执行 **同日 165 卡库不重复** 机制。
+2. **八大维度任务定制与调度（每日任务）**：
+   - 点击 **「分类生成」**，可分别为 **学习、工作、运动、饮食、社交、技能、生活、睡眠** 单独选择 **「🎲 全随机」** 或 **「✍️ 自定义方向」**（例如学习输入 `AI` 或 `荣格心理学`）。
+   - 如果某项任务暂时不合适，点击任务右侧的 **🎲（换一个）** 按钮，**填写正当理由** 后即可重新随机该单项任务，理由会自动记入日志。
+   - 遇到突发事务，点击 **「导入任务」** 选择 `🚨 紧急导入`，会以最高优先级置顶。
+3. **随手写手记（冒险日志）**：
+   - 系统自动汇总当日海克斯、任务完成度与重随理由；你只需在右侧选择当日心情/环境并写下简短感悟，随时可点击 **「AI 精炼评语」** 生成史官总结。
+4. **晚 22:00 小结算与周日大结算（结算）**：
+   - 每天晚上 10 点前往 **「结算」** 页点击 **「立即触发今日小结算」**，根据完成率掉落小鱼干、可乐、游戏自由券等现实战利品；每周日触发 **「本周大结算」** 开启周终极宝箱。
+5. **换机或清理缓存前备份（API/安装）**：
+   - 在 **「API/安装」** 页底部点击 **「📤 导出存档备份」** 可保存 `.json` 进度文件，随时可一键恢复。
+```
+
+### 本次更新总结：
+1. **安卓移动端 APP 化改造 (`index.html`)**：
+   - 新增安卓底部原生风格导航栏、安全区适配与动态 **PWA Manifest + 矢量应用图标**，手机浏览器添加到主屏幕后即可全屏独立运行。
+   - 新增 **「API/安装」设置中心**，支持在手机端直接粘贴保存 Gemini API Key、一键测试连通性，以及导出/恢复 `.json` 本地存档备份。
+2. **完整使用与 API 连接说明书 (`ANDROID_APP_MANUAL.md`)**：
+   - 详细列出了安卓手机一键安装桌面 APP 与 Capacitor 打包 `.apk` 两种方案，以及从获取 Gemini API Key 到手机端测试连通的完整操作步骤。
