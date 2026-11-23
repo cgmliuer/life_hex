@@ -1,55 +1,49 @@
-name: Build Android APK (人生海克斯)
+name: Build Android APK
 
-on:
+"on":
 push:
 branches: [ main, master ]
 workflow_dispatch:
+
+permissions:
+contents: read
 
 jobs:
 build-apk:
 runs-on: ubuntu-latest
 
 steps:
-  - name: 1. 检出代码
+  - name: Checkout
     uses: actions/checkout@v4
 
-  - name: 2. 安装 Node.js 环境
+  - name: Setup Node
     uses: actions/setup-node@v4
     with:
-      node-version: '20'
+      node-version: "20"
 
-  - name: 3. 配置 Java 17
+  - name: Setup Java
     uses: actions/setup-java@v4
     with:
-      distribution: 'temurin'
-      java-version: '17'
+      distribution: "temurin"
+      java-version: "21"
 
-  - name: 4. 配置 Android SDK
-    uses: android-actions/setup-android@v3
-
-  - name: 5. 初始化 Capacitor 并封装网页为 Android 工程
+  - name: Build Capacitor Android Project
     run: |
       mkdir -p www
-      if [ -f "index.html" ]; then
-        cp index.html www/index.html
-      elif [ -f "life_hextech.html" ]; then
-        cp life_hextech.html www/index.html
-      else
-        echo "未找到 HTML 文件！" && exit 1
-      fi
+      cp index.html www/index.html
       npm init -y
-      npm install @capacitor/core @capacitor/cli @capacitor/android
+      npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
       npx cap init "LifeHextech" "com.life.hextech" --web-dir www
       npx cap add android
       npx cap sync android
 
-  - name: 6. 编译生成 Debug APK 安装包
+  - name: Assemble Debug APK
     run: |
       cd android
       chmod +x gradlew
       ./gradlew assembleDebug
 
-  - name: 7. 上传生成好的 APK 供下载
+  - name: Upload APK
     uses: actions/upload-artifact@v4
     with:
       name: LifeHextech-Android-APK
